@@ -26,6 +26,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-logging")
+	implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
 	implementation("io.github.openfeign.querydsl:querydsl-jpa:7.0")
 	implementation("io.github.openfeign.querydsl:querydsl-apt:7.0")
 	implementation("io.jsonwebtoken:jjwt-api:0.12.6")

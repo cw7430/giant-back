@@ -1,0 +1,98 @@
+package com.giant.common.config.security
+
+import io.jsonwebtoken.Claims
+import io.jsonwebtoken.JwtException
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.io.Decoders
+import io.jsonwebtoken.security.Keys
+import jakarta.servlet.http.HttpServletRequest
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Component
+import java.time.Duration
+import javax.crypto.SecretKey
+import java.util.*
+
+@Component
+class JwtProvider(
+    @Value("\${jwt.access.secret}") accessSecretKey: String,
+    @Value("\${jwt.access.expiration}") accessTokenExpireTime: Duration,
+    @Value("\${jwt.refresh.secret}") refreshSecretKey: String,
+    @Value("\${jwt.refresh.expiration}") refreshTokenExpireTime: Duration
+) {
+    private val accessSecretKey: SecretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(accessSecretKey))
+    private val accessTokenExpireTime: Long = accessTokenExpireTime.toMillis()
+    private val refreshSecretKey: SecretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(refreshSecretKey))
+    private val refreshTokenExpireTime: Long = refreshTokenExpireTime.toMillis()
+
+    /**
+     * AccessToken 생성
+     */
+    fun generateAccessToken(userName: String, authority: String): String {
+        val now = Date()
+        val expiry = Date(now.time + accessTokenExpireTime)
+
+        return Jwts.builder()
+            .subject(userName)
+            .claim("authority", authority)
+            .issuedAt(now)
+            .expiration(expiry)
+            .signWith(accessSecretKey, Jwts.SIG.HS256)
+            .compact()
+    }
+
+    /**
+     * RefreshToken 생성
+     */
+    fun generateRefreshToken(userName: String, isAuto: Boolean = false): String {
+        val now = Date()
+        val expiry = when (isAuto) {
+            true -> Date(now.time + Duration.ofDays(365).toMillis())
+            false -> Date(now.time + refreshTokenExpireTime)
+        }
+
+        return Jwts.builder()
+            .subject(userName)
+            .issuedAt(now)
+            .expiration(expiry)
+            .signWith(refreshSecretKey, Jwts.SIG.HS256)
+            .compact()
+    }
+
+    /**
+     * Claim 변환
+     */
+    private fun parseClaims(token: String, isRefresh: Boolean): Claims? =
+        runCatching {
+            val key = if (isRefresh) refreshSecretKey else accessSecretKey
+            Jwts.parser().verifyWith(key).build().parseSignedClaims(token).payload
+        }.getOrNull()
+
+    /**
+     * Token 검증
+     */
+    fun validateToken(token: String, isRefresh: Boolean = false): Boolean =
+        parseClaims(token, isRefresh) != null
+
+    /**
+     * Claim 추출
+     */
+    fun getClaims(token: String, isRefresh: Boolean = false): Claims =
+        parseClaims(token, isRefresh)
+            ?: throw JwtException("Invalid or expired token")
+
+    /**
+     * AccessToken 추출
+     */
+    fun extractAccessToken(request: HttpServletRequest): String? =
+        request.getHeader("Authorization")
+            ?.takeIf { it.startsWith("Bearer ") }
+            ?.substring(7)
+
+    /**
+     * RefreshToken 추출
+     */
+    fun extractRefreshToken(request: HttpServletRequest): String? =
+        request.cookies
+            ?.firstOrNull { it.name == "refreshToken" }
+            ?.value
+}
