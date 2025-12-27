@@ -1,5 +1,6 @@
 package com.giant.auth.entity
 
+import com.giant.employee.entity.EmployeeProfile
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
@@ -30,5 +31,8 @@ data class Account(
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
-    val updatedAt: Instant
+    val updatedAt: Instant,
+
+    @OneToOne(mappedBy = "account", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    val employeeProfile: EmployeeProfile? = null
     )
