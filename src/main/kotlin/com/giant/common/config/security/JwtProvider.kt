@@ -27,13 +27,14 @@ class JwtProvider(
     /**
      * AccessToken 생성
      */
-    fun generateAccessToken(userName: String, authority: String): String {
+    fun generateAccessToken(userId: String, accountRole: String, employeeRole: String): String {
         val now = Date()
         val expiry = Date(now.time + accessTokenExpireTime)
 
         return Jwts.builder()
-            .subject(userName)
-            .claim("authority", authority)
+            .subject(userId)
+            .claim("authority", accountRole)
+            .claim("employeeRole", employeeRole)
             .issuedAt(now)
             .expiration(expiry)
             .signWith(accessSecretKey, Jwts.SIG.HS256)
@@ -43,7 +44,7 @@ class JwtProvider(
     /**
      * RefreshToken 생성
      */
-    fun generateRefreshToken(userName: String, isAuto: Boolean = false): String {
+    fun generateRefreshToken(userId: String, isAuto: Boolean = false): String {
         val now = Date()
         val expiry = when (isAuto) {
             true -> Date(now.time + Duration.ofDays(365).toMillis())
@@ -51,7 +52,7 @@ class JwtProvider(
         }
 
         return Jwts.builder()
-            .subject(userName)
+            .subject(userId)
             .issuedAt(now)
             .expiration(expiry)
             .signWith(refreshSecretKey, Jwts.SIG.HS256)

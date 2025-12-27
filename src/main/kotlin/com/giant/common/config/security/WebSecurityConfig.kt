@@ -36,16 +36,10 @@ class WebSecurityConfig(
                     ).permitAll()
                     .requestMatchers(
                         "/api/v1/user/**"
-                    ).hasAnyRole("CEO", "MANAGER", "EMPLOYEE", "EXTERNAL")
+                    ).hasAnyRole("INTERNAL", "EXTERNAL")
                     .requestMatchers(
                         "/api/v1/internal/**"
-                    ).hasAnyRole("CEO", "MANAGER", "EMPLOYEE")
-                    .requestMatchers(
-                        "/api/v1/manager/**"
-                    ).hasAnyRole("CEO", "MANAGER")
-                    .requestMatchers(
-                        "/api/v1/ceo/**"
-                    ).hasAnyRole("CEO")
+                    ).hasAnyRole("INTERNAL", "EMPLOYEE")
             }
             .addFilterBefore(
                 JwtAuthenticationFilter(jwtProvider),
