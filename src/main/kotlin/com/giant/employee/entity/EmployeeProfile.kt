@@ -3,12 +3,14 @@ package com.giant.employee.entity
 import com.giant.auth.entity.Account
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.Generated
 import org.hibernate.annotations.UpdateTimestamp
+import org.hibernate.generator.EventType
 import java.time.Instant
 
 @Entity
 @Table(name = "employee_profile", schema = "employee")
-data class EmployeeProfile (
+data class EmployeeProfile(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,8 +21,17 @@ data class EmployeeProfile (
     @JoinColumn(name = "account_id", nullable = false, foreignKey = ForeignKey(name = "fk_employee_account"))
     val account: Account,
 
-    @Column(name = "employee_code", nullable = false, unique = true, length = 255)
-    val employeeCode: String,
+    @Column(
+        name = "employee_code",
+        nullable = false,
+        unique = true,
+        length = 255,
+        insertable = false,
+        updatable = false,
+        columnDefinition = "VARCHAR(255) DEFAULT employee.get_next_emp_code()"
+    )
+    @Generated(event = [EventType.INSERT])
+    val employeeCode: String? = null,
 
     @Column(name = "employee_name", nullable = false, length = 255)
     val employeeName: String,
