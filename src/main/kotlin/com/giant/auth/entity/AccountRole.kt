@@ -7,7 +7,7 @@ import jakarta.persistence.*
 data class AccountRole(
     @Id
     @Column(name = "id")
-    val roleId: Long,
+    val accountRoleId: Long,
 
     @Column(name = "role_name", nullable = false, unique = true, length = 25)
     val accountRoleName: String,
