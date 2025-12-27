@@ -1,15 +1,15 @@
 package com.giant.common.api.response
 
-sealed class ApiErrorResponse : ApiResponse() {
+sealed class ErrorResponseDto : ResponseDto() {
 
     data class Simple(
         override val code: String,
         override val message: String
-    ) : ApiErrorResponse()
+    ) : ErrorResponseDto()
 
     data class WithErrors<T>(
         override val code: String,
         override val message: String,
         val errors: T
-    ) : ApiErrorResponse()
+    ) : ErrorResponseDto()
 }

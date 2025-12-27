@@ -2,16 +2,16 @@ package com.giant.common.api.response
 
 import com.giant.common.api.code.ResponseCode
 
-sealed class ApiSuccessResponse : ApiResponse() {
+sealed class SuccessResponseDto : ResponseDto() {
 
-    object Simple : ApiSuccessResponse() {
+    object Simple : SuccessResponseDto() {
         override val code: String = ResponseCode.SUCCESS.code
         override val message: String = ResponseCode.SUCCESS.message
     }
 
     data class WithResult<T>(
         val result: T
-    ) : ApiSuccessResponse() {
+    ) : SuccessResponseDto() {
         override val code: String = ResponseCode.SUCCESS.code
         override val message: String = ResponseCode.SUCCESS.message
     }

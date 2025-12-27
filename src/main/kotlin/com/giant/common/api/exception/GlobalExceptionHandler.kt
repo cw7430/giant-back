@@ -2,8 +2,8 @@ package com.giant.common.api.exception
 
 import com.giant.common.api.code.ResponseCode
 import com.giant.common.api.error.ValidationError
-import com.giant.common.api.response.ApiErrorResponse
-import com.giant.common.api.response.ApiResponse
+import com.giant.common.api.response.ErrorResponseDto
+import com.giant.common.api.response.ResponseDto
 import mu.KotlinLogging
 import org.springframework.dao.DataAccessException
 import org.springframework.http.ResponseEntity
@@ -20,7 +20,7 @@ class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidationException(
         ex: MethodArgumentNotValidException
-    ): ResponseEntity<ApiResponse> {
+    ): ResponseEntity<ResponseDto> {
 
         val errors = ex.bindingResult.fieldErrors.map {
             ValidationError(
@@ -32,7 +32,7 @@ class GlobalExceptionHandler {
         log.error { "Validation failed: $errors" }
 
         return ResponseEntity(
-            ApiErrorResponse.WithErrors(
+            ErrorResponseDto.WithErrors(
                 ResponseCode.VALIDATION_ERROR.code,
                 ResponseCode.VALIDATION_ERROR.message,
                 errors
@@ -42,10 +42,10 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(CustomException::class)
-    fun handleCustomException(ex: CustomException): ResponseEntity<ApiResponse> {
+    fun handleCustomException(ex: CustomException): ResponseEntity<ResponseDto> {
         log.error { "Custom exception occurred: ${ex.responseCode.message}" }
         return ResponseEntity(
-            ApiErrorResponse.Simple(
+            ErrorResponseDto.Simple(
                 ex.responseCode.code,
                 ex.responseCode.message
             ),
@@ -54,19 +54,19 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(DataAccessException::class)
-    fun handleDatabaseException(ex: DataAccessException): ResponseEntity<ApiResponse> {
+    fun handleDatabaseException(ex: DataAccessException): ResponseEntity<ResponseDto> {
         log.error(ex) { "Database exception occurred" }
         return ResponseEntity(
-            ApiErrorResponse.Simple(ResponseCode.INTERNAL_SERVER_ERROR.code, ResponseCode.INTERNAL_SERVER_ERROR.message),
+            ErrorResponseDto.Simple(ResponseCode.INTERNAL_SERVER_ERROR.code, ResponseCode.INTERNAL_SERVER_ERROR.message),
             ResponseCode.INTERNAL_SERVER_ERROR.status
         )
     }
 
     @ExceptionHandler(Exception::class)
-    fun handleGeneralException(ex: Exception): ResponseEntity<ApiResponse> {
+    fun handleGeneralException(ex: Exception): ResponseEntity<ResponseDto> {
         log.error(ex) { "Unhandled exception occurred" }
         return ResponseEntity(
-            ApiErrorResponse.Simple(ResponseCode.INTERNAL_SERVER_ERROR.code, ResponseCode.INTERNAL_SERVER_ERROR.message),
+            ErrorResponseDto.Simple(ResponseCode.INTERNAL_SERVER_ERROR.code, ResponseCode.INTERNAL_SERVER_ERROR.message),
             ResponseCode.INTERNAL_SERVER_ERROR.status
         )
     }
