@@ -2,6 +2,11 @@ spring:
   application:
     name: giant
   datasource:
-    driver-class-name: org.postgresql.Driver
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  jackson:
+    time-zone: UTC
   profiles:
-    active: develop
+    active: local
+
+server:
+  port: 8080

@@ -6,10 +6,16 @@ import jakarta.persistence.*
 @Table(name = "employee_role", schema = "employee")
 data class EmployeeRole(
     @Id
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     val employeeRoleId: Long,
 
-    @Column(name = "role_name", nullable = false, unique = true, length = 25)
+    @Column(
+        name = "role_name",
+        nullable = false,
+        unique = true,
+        length = 255,
+        columnDefinition = "nvarchar(255)"
+    )
     val employeeRoleName: String,
 
     @OneToMany(mappedBy = "employeeRole", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
