@@ -8,7 +8,7 @@ spring:
   datasource:
     url: jdbc:sqlserver://localhost:1433/giant
     username: sa
-    password: my-password
+    password: my-password # 👉 Set your password here
   jpa:
     hibernate:
       ddl-auto: none
@@ -22,10 +22,10 @@ spring:
 
 jwt:
   access:
-    secret: my-secret-key
+    secret: my-secret-key # 👉 Set your access token secret key here
     expiration: 3m
   refresh:
-    secret: my-secret-key
+    secret: my-secret-key # 👉 Set your refresh token secret key password here
     expiration: 14d
 
 logging:

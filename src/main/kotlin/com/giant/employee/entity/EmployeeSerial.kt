@@ -8,12 +8,18 @@ data class EmployeeSerial(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    val serialId: Long,
+    @Column(name = "id", nullable = false)
+    val serialId: Long = 0,
 
-    @Column(name = "serial_name", nullable = false, unique = true, length = 255)
+    @Column(
+        name = "serial_name",
+        nullable = false,
+        unique = true,
+        length = 255,
+        columnDefinition = "nvarchar(255)"
+    )
     val serialName: String,
 
-    @Column(name = "serial_value")
+    @Column(name = "serial_value", nullable = false)
     val serialValue: Long
 )
