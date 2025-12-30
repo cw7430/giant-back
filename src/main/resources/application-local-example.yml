@@ -1,0 +1,33 @@
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html # 👉 OpenAPI JSON 문서 경로 (기본: /api-docs)
+  api-docs:
+    path: /api-docs  # 👉 Swagger UI 접속 경로 (기본: /swagger-ui/index.html)
+
+spring:
+  datasource:
+    url: jdbc:sqlserver://localhost:1433/giant
+    username: sa
+    password: my-password # 👉 Set your password here
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        highlight_sql: true
+        type: trace
+
+jwt:
+  access:
+    secret: my-secret-key # 👉 Set your access token secret key here
+    expiration: 3m
+  refresh:
+    secret: my-secret-key # 👉 Set your refresh token secret key password here
+    expiration: 14d
+
+logging:
+  level:
+    org.hibernate.orm.jdbc.bind: trace
