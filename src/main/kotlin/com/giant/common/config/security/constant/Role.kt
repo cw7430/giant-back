@@ -1,4 +1,4 @@
-package com.giant.common.config.security
+package com.giant.common.config.security.constant
 
 enum class Role(val code: String, val authority: String) {
     ADMIN("1", "ROLE_ADMIN"),
