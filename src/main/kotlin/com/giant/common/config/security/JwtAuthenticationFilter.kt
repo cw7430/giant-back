@@ -1,5 +1,6 @@
 package com.giant.common.config.security
 
+import com.giant.common.config.security.constant.ClaimElement
 import com.giant.common.config.security.constant.Role
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletException
@@ -15,7 +16,7 @@ import java.io.IOException
 
 @Component
 class JwtAuthenticationFilter(
-    private val jwtUtil: JwtUtil
+    private val jwtProvider: JwtProvider
 ) : OncePerRequestFilter() {
 
     private val log = KotlinLogging.logger {}
@@ -26,17 +27,36 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val claims = jwtUtil.extractClaimsFromAccessToken(request)
-        val userId = claims.userId
-        val roleCode = claims.accountRole
-        val role = Role.fromCode(roleCode)
+        val token = extractToken(request)
 
-        val authorities = listOf(SimpleGrantedAuthority(role.authority))
-        log.debug { "Authenticated user: $userId (${role.authority})" }
-        SecurityContextHolder.getContext().authentication =
-            UsernamePasswordAuthenticationToken(userId, null, authorities)
+        if (token != null) {
+            runCatching {
+                val claims = jwtProvider.parseClaims(token) ?: return@runCatching
 
+                val userId = claims.subject
+                val roleCode = claims.get(ClaimElement.ACCOUNT_ROLE.element, String::class.java)
+                val role = Role.fromCode(roleCode)
+
+                val authorities = listOf(SimpleGrantedAuthority(role.authority))
+
+                SecurityContextHolder.getContext().authentication =
+                    UsernamePasswordAuthenticationToken(userId, null, authorities)
+                
+                log.debug { "Authenticated user: $userId (${role.authority})" }
+            }.onFailure { e ->
+                log.warn { "JWT Authentication failed: ${e.message}" }
+                SecurityContextHolder.clearContext()
+            }
+        }
 
         filterChain.doFilter(request, response)
+    }
+
+    private fun extractToken(request: HttpServletRequest): String? {
+        return request.getHeader("Authorization")
+            ?.takeIf { it.startsWith("Bearer ", ignoreCase = true) }
+            ?.substring(7)
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
     }
 }

@@ -12,7 +12,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 class WebSecurityConfig(
-    private val jwtUtil: JwtUtil
+    private val jwtAuthenticationFilter: JwtAuthenticationFilter
 ) {
 
     @Bean
@@ -42,7 +42,7 @@ class WebSecurityConfig(
                     ).hasAnyRole("ADMIN")
             }
             .addFilterBefore(
-                JwtAuthenticationFilter(jwtUtil),
+                jwtAuthenticationFilter,
                 UsernamePasswordAuthenticationFilter::class.java
             )
             .build()

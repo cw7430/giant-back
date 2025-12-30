@@ -63,7 +63,7 @@ class JwtProvider(
     /**
      * Claim 변환
      */
-    private fun parseClaims(token: String, isRefresh: Boolean = false): Claims? =
+    fun parseClaims(token: String, isRefresh: Boolean = false): Claims? =
         runCatching {
             val key = if (isRefresh) refreshSecretKey else accessSecretKey
             Jwts.parser().verifyWith(key).build().parseSignedClaims(token).payload

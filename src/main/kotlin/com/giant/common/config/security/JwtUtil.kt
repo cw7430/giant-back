@@ -37,11 +37,17 @@ class JwtUtil(private val jwtProvider: JwtProvider) {
         return token
     }
 
+    /**
+     * AccessToken 검증
+     */
+    fun validateAccessToken(request: HttpServletRequest) {
+        jwtProvider.getClaims(extractAccessToken(request))
+    }
 
-    fun extractUserIdFromRefreshToken(request: HttpServletRequest): String =
-        jwtProvider.getClaims(extractRefreshToken(request), true).subject
 
-
+    /**
+     * AccessToken 에서 claim 추출
+     */
     fun extractClaimsFromAccessToken(request: HttpServletRequest): ClaimDto {
         val token = extractAccessToken(request)
         val claims = jwtProvider.getClaims(token)
@@ -53,5 +59,9 @@ class JwtUtil(private val jwtProvider: JwtProvider) {
         )
     }
 
-
+    /**
+     * RefreshToken 에서 userId 추출
+     */
+    fun extractUserIdFromRefreshToken(request: HttpServletRequest): String =
+        jwtProvider.getClaims(extractRefreshToken(request), true).subject
 }
