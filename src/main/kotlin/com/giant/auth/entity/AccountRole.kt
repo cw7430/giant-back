@@ -6,12 +6,18 @@ import jakarta.persistence.*
 @Table(name = "account_role", schema = "auth")
 data class AccountRole(
     @Id
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     val accountRoleId: Long,
 
-    @Column(name = "role_name", nullable = false, unique = true, length = 25)
+    @Column(
+        name = "role_name",
+        nullable = false,
+        unique = true,
+        length = 255,
+        columnDefinition = "nvarchar(255)"
+    )
     val accountRoleName: String,
 
-    @OneToMany(mappedBy = "accountRole", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "accountRole", fetch = FetchType.LAZY)
     val accounts: MutableList<Account> = mutableListOf()
 )
