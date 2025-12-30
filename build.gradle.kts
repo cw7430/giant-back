@@ -32,7 +32,7 @@ dependencies {
 	implementation("io.jsonwebtoken:jjwt-api:0.12.6")
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
-	implementation("org.postgresql:postgresql")
+	implementation("com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0")
 
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")

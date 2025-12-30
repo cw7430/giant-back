@@ -21,15 +21,7 @@ data class EmployeeProfile(
     @JoinColumn(name = "account_id", nullable = false, foreignKey = ForeignKey(name = "fk_employee_account"))
     val account: Account,
 
-    @Column(
-        name = "employee_code",
-        nullable = false,
-        unique = true,
-        length = 255,
-        insertable = false,
-        updatable = false,
-        columnDefinition = "VARCHAR(255) DEFAULT employee.get_next_emp_code()"
-    )
+    @Column(name = "employee_code", nullable = false, unique = true, length = 255)
     @Generated(event = [EventType.INSERT])
     val employeeCode: String? = null,
 
