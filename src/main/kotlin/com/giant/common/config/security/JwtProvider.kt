@@ -1,11 +1,12 @@
 package com.giant.common.config.security
 
+import com.giant.common.api.code.ResponseCode
+import com.giant.common.api.exception.CustomException
+import com.giant.common.config.security.constant.ClaimElement
 import io.jsonwebtoken.Claims
-import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
-import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import java.time.Duration
@@ -33,8 +34,8 @@ class JwtProvider(
 
         return Jwts.builder()
             .subject(userId)
-            .claim("authority", accountRole)
-            .claim("employeeRole", employeeRole)
+            .claim(ClaimElement.ACCOUNT_ROLE.element, accountRole)
+            .claim(ClaimElement.EMPLOYEE_ROLE.element, employeeRole)
             .issuedAt(now)
             .expiration(expiry)
             .signWith(accessSecretKey, Jwts.SIG.HS256)
@@ -62,38 +63,17 @@ class JwtProvider(
     /**
      * Claim 변환
      */
-    private fun parseClaims(token: String, isRefresh: Boolean): Claims? =
+    private fun parseClaims(token: String, isRefresh: Boolean = false): Claims? =
         runCatching {
             val key = if (isRefresh) refreshSecretKey else accessSecretKey
             Jwts.parser().verifyWith(key).build().parseSignedClaims(token).payload
         }.getOrNull()
 
     /**
-     * Token 검증
-     */
-    fun validateToken(token: String, isRefresh: Boolean = false): Boolean =
-        parseClaims(token, isRefresh) != null
-
-    /**
      * Claim 추출
      */
     fun getClaims(token: String, isRefresh: Boolean = false): Claims =
         parseClaims(token, isRefresh)
-            ?: throw JwtException("Invalid or expired token")
+            ?: throw CustomException(ResponseCode.UNAUTHORIZED)
 
-    /**
-     * AccessToken 추출
-     */
-    fun extractAccessToken(request: HttpServletRequest): String? =
-        request.getHeader("Authorization")
-            ?.takeIf { it.startsWith("Bearer ") }
-            ?.substring(7)
-
-    /**
-     * RefreshToken 추출
-     */
-    fun extractRefreshToken(request: HttpServletRequest): String? =
-        request.cookies
-            ?.firstOrNull { it.name == "refreshToken" }
-            ?.value
 }

@@ -1,5 +1,6 @@
 package com.giant.common.config.security
 
+import com.giant.common.config.security.constant.Role
 import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest
@@ -9,13 +10,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
-import org.springframework.util.StringUtils
 import org.springframework.web.filter.OncePerRequestFilter
 import java.io.IOException
 
 @Component
 class JwtAuthenticationFilter(
-    private val jwtProvider: JwtProvider
+    private val jwtUtil: JwtUtil
 ) : OncePerRequestFilter() {
 
     private val log = KotlinLogging.logger {}
@@ -26,19 +26,16 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val token = jwtProvider.extractAccessToken(request)
+        val claims = jwtUtil.extractClaimsFromAccessToken(request)
+        val userId = claims.userId
+        val roleCode = claims.accountRole
+        val role = Role.fromCode(roleCode)
 
-        token?.takeIf { StringUtils.hasText(it) && jwtProvider.validateToken(it, false) }?.let {
-            val claims = jwtProvider.getClaims(it, false)
-            val userId = claims.subject
-            val roleCode = claims.get("authority", String::class.java)
-            val role = Role.fromCode(roleCode)
+        val authorities = listOf(SimpleGrantedAuthority(role.authority))
+        log.debug { "Authenticated user: $userId (${role.authority})" }
+        SecurityContextHolder.getContext().authentication =
+            UsernamePasswordAuthenticationToken(userId, null, authorities)
 
-            val authorities = listOf(SimpleGrantedAuthority(role.authority))
-            log.debug { "Authenticated user: $userId (${role.authority})" }
-            SecurityContextHolder.getContext().authentication =
-                UsernamePasswordAuthenticationToken(userId, null, authorities)
-        }
 
         filterChain.doFilter(request, response)
     }
