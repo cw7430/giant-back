@@ -45,7 +45,7 @@ data class Account(
         nullable = false,
         foreignKey = ForeignKey(name = "fk_account_role")
     )
-    val role: AccountRole,
+    val accountRole: AccountRole,
 
     @Column(
         name = "created_at",
