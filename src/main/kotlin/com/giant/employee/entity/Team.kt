@@ -22,7 +22,7 @@ data class Team(
     @Column(name = "team_name", nullable = false, unique = true, length = 255)
     val teamName: String,
 
-    @Column(name = "team_head_id", unique = true)
+    @Column(name = "team_head_id")
     val teamHeadId: Long? = null,
 
     @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
