@@ -1,9 +1,11 @@
 plugins {
 	kotlin("jvm") version "1.9.25"
 	kotlin("plugin.spring") version "1.9.25"
+	kotlin("plugin.jpa") version "1.9.25"
 	id("org.springframework.boot") version "3.5.9"
 	id("io.spring.dependency-management") version "1.1.7"
-	kotlin("plugin.jpa") version "1.9.25"
+	id("com.google.devtools.ksp") version "1.9.25-1.0.20"
+
 }
 
 group = "com"
@@ -27,14 +29,18 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-logging")
 	implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
+
+	// QueryDSL
 	implementation("io.github.openfeign.querydsl:querydsl-jpa:7.0")
-	implementation("io.github.openfeign.querydsl:querydsl-apt:7.0")
+	ksp("io.github.openfeign.querydsl:querydsl-ksp-codegen:7.0")
+
+	// JWT
 	implementation("io.jsonwebtoken:jjwt-api:0.12.6")
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
-	implementation("com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11")
-	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0")
 
+	implementation("com.microsoft.sqlserver:mssql-jdbc:13.2.1.jre11")
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 
