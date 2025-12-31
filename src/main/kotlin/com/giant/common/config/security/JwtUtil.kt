@@ -4,6 +4,7 @@ import com.giant.common.api.code.ResponseCode
 import com.giant.common.api.exception.CustomException
 import com.giant.common.config.security.constant.ClaimElement
 import com.giant.common.config.security.dto.ClaimDto
+import io.jsonwebtoken.Claims
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.stereotype.Component
 
@@ -38,10 +39,17 @@ class JwtUtil(private val jwtProvider: JwtProvider) {
     }
 
     /**
+     * Claim 추출
+     */
+    private fun getClaims(token: String, isRefresh: Boolean = false): Claims =
+        jwtProvider.parseClaims(token, isRefresh)
+            ?: throw CustomException(ResponseCode.UNAUTHORIZED)
+
+    /**
      * AccessToken 검증
      */
     fun validateAccessToken(request: HttpServletRequest) {
-        jwtProvider.getClaims(extractAccessToken(request))
+        getClaims(extractAccessToken(request))
     }
 
 
@@ -50,7 +58,7 @@ class JwtUtil(private val jwtProvider: JwtProvider) {
      */
     fun extractClaimsFromAccessToken(request: HttpServletRequest): ClaimDto {
         val token = extractAccessToken(request)
-        val claims = jwtProvider.getClaims(token)
+        val claims = getClaims(token)
 
         return ClaimDto(
             userId = claims.subject,
@@ -63,5 +71,5 @@ class JwtUtil(private val jwtProvider: JwtProvider) {
      * RefreshToken 에서 userId 추출
      */
     fun extractUserIdFromRefreshToken(request: HttpServletRequest): String =
-        jwtProvider.getClaims(extractRefreshToken(request), true).subject
+        getClaims(extractRefreshToken(request), true).subject
 }
