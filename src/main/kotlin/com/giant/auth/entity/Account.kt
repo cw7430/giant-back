@@ -43,6 +43,7 @@ data class Account(
     @JoinColumn(
         name = "account_role_id",
         nullable = false,
+        columnDefinition = "bigint default 2",
         foreignKey = ForeignKey(name = "fk_account_role")
     )
     val accountRole: AccountRole,

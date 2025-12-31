@@ -3,5 +3,8 @@ package com.giant.auth.dto
 data class SignInDto (
     val accountId: Long,
     val passwordHash: String,
-    val accountRoleId: Long
+    val accountRoleId: Long,
+    val accountRoleName: String,
+    val employeeRoleId: Long,
+    val employeeRoleName: String
 )
