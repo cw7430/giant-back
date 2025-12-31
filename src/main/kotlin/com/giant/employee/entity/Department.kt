@@ -18,7 +18,7 @@ data class Department(
     )
     val departmentName: String,
 
-    @Column(name = "department_head_id", unique = true)
+    @Column(name = "department_head_id")
     val departmentHeadId: Long? = null,
 
     @OneToMany(mappedBy = "department", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
