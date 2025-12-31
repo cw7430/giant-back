@@ -6,7 +6,7 @@ springdoc:
 
 spring:
   datasource:
-    url: jdbc:sqlserver://localhost:1433/giant
+    url: jdbc:sqlserver://localhost:1433;databaseName=giant;trustServerCertificate=true
     username: sa
     password: my-password # 👉 Set your password here
   jpa:
