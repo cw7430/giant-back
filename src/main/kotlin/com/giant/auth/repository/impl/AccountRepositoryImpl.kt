@@ -7,17 +7,22 @@ import com.giant.auth.repository.custom.AccountRepositoryCustom
 import com.giant.employee.entity.QEmployeeProfile
 import com.giant.employee.entity.QEmployeeRole
 import com.querydsl.core.types.Projections
+import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.jpa.impl.JPAQueryFactory
 
+@Suppress("unused")
 class AccountRepositoryImpl (
     private val queryFactory: JPAQueryFactory
 ) : AccountRepositoryCustom {
 
-    override fun findSignInInfoByUserName(userName: String): SignInDto? {
+    private fun findSignInInfo(
+        predicate: BooleanExpression
+    ): SignInDto? {
         val account = QAccount.account
         val accountRole = QAccountRole.accountRole
         val employee = QEmployeeProfile.employeeProfile
         val employeeRole = QEmployeeRole.employeeRole
+
         return queryFactory
             .select(
                 Projections.constructor(
@@ -34,8 +39,14 @@ class AccountRepositoryImpl (
             .join(account.accountRole, accountRole)
             .join(account.employeeProfile, employee)
             .join(employee.employeeRole, employeeRole)
-            .where(account.userName.eq(userName))
+            .where(predicate)
             .fetchOne()
     }
+
+    override fun findSignInInfoByUserName(userName: String): SignInDto? =
+        findSignInInfo(QAccount.account.userName.eq(userName))
+
+    override fun findRefreshInfoByAccountId(accountId: Long): SignInDto? =
+        findSignInInfo(QAccount.account.accountId.eq(accountId))
 
 }
