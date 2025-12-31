@@ -32,7 +32,9 @@ class WebSecurityConfig(
                 auth
                     .requestMatchers(
                         "/swagger-ui/**",
-                        "/api/v1/public/**"
+                        "api-docs/**",
+                        "/api/v1/public/**",
+                        "/api/v1/auth/sign-in"
                     ).permitAll()
                     .requestMatchers(
                         "/api/v1/user/**"
