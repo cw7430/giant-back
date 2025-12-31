@@ -69,11 +69,4 @@ class JwtProvider(
             Jwts.parser().verifyWith(key).build().parseSignedClaims(token).payload
         }.getOrNull()
 
-    /**
-     * Claim 추출
-     */
-    fun getClaims(token: String, isRefresh: Boolean = false): Claims =
-        parseClaims(token, isRefresh)
-            ?: throw CustomException(ResponseCode.UNAUTHORIZED)
-
 }
