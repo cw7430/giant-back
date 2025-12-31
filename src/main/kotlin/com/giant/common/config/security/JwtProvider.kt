@@ -1,7 +1,5 @@
 package com.giant.common.config.security
 
-import com.giant.common.api.code.ResponseCode
-import com.giant.common.api.exception.CustomException
 import com.giant.common.config.security.constant.ClaimElement
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
