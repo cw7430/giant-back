@@ -5,7 +5,6 @@ plugins {
 	id("org.springframework.boot") version "3.5.9"
 	id("io.spring.dependency-management") version "1.1.7"
 	id("com.google.devtools.ksp") version "1.9.25-1.0.20"
-
 }
 
 group = "com"
