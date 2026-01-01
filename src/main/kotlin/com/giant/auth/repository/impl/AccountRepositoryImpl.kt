@@ -11,8 +11,9 @@ import com.giant.employee.entity.QTeam
 import com.querydsl.core.types.Projections
 import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.jpa.impl.JPAQueryFactory
+import org.springframework.stereotype.Repository
 
-@Suppress("unused")
+@Repository
 class AccountRepositoryImpl (
     private val queryFactory: JPAQueryFactory
 ) : AccountRepositoryCustom {
@@ -35,6 +36,7 @@ class AccountRepositoryImpl (
                     account.passwordHash,
                     accountRole.accountRoleId,
                     accountRole.accountRoleName,
+                    employee.employeeName,
                     employeeRole.employeeRoleName,
                     department.departmentName,
                     team.teamName

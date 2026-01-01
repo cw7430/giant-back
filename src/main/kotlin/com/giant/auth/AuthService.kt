@@ -4,7 +4,6 @@ import com.giant.auth.dto.request.SignInRequestDto
 import com.giant.auth.dto.response.RefreshRequestDto
 import com.giant.auth.dto.response.SignInResponseDto
 import com.giant.auth.repository.AccountRepository
-import com.giant.auth.repository.AccountRoleRepository
 import com.giant.common.api.code.ResponseCode
 import com.giant.common.api.exception.CustomException
 import com.giant.common.config.security.JwtProvider
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service
 @Service
 class AuthService (
     private val accountRepository: AccountRepository,
-    private val accountRoleRepository: AccountRoleRepository,
     private val passwordEncoder: PasswordEncoder,
     private val jwtProvider: JwtProvider,
     private val jwtUtil: JwtUtil
@@ -31,6 +29,10 @@ class AuthService (
                 signInRequestDto.password, signInInfo.passwordHash
             )
             )  throw CustomException(ResponseCode.LOGIN_ERROR)
+
+        if (signInInfo.accountRoleId == 3L) {
+            throw CustomException(ResponseCode.FORBIDDEN)
+        }
 
         val accessToken = jwtProvider.generateAccessToken(
             signInInfo.accountId.toString(),
@@ -48,6 +50,7 @@ class AuthService (
         return SignInResponseDto(
             accessToken,
             expiresAt,
+            signInInfo.employeeName,
             signInInfo.accountRoleName,
             signInInfo.employeeRoleName
         )
@@ -60,7 +63,11 @@ class AuthService (
     fun refreshAccessToken(request: HttpServletRequest, response: HttpServletResponse, refreshRequestDto: RefreshRequestDto): SignInResponseDto {
         val accountId = jwtUtil.extractUserIdFromRefreshToken(request).toLong()
         val refreshInfo =
-            accountRepository.findRefreshInfoByAccountId(accountId) ?: throw CustomException(ResponseCode.LOGIN_ERROR)
+            accountRepository.findRefreshInfoByAccountId(accountId) ?: throw CustomException(ResponseCode.UNAUTHORIZED)
+
+        if (refreshInfo.accountRoleId == 3L) {
+            throw CustomException(ResponseCode.FORBIDDEN)
+        }
 
         val accessToken = jwtProvider.generateAccessToken(
             refreshInfo.accountId.toString(),
@@ -78,6 +85,7 @@ class AuthService (
         return SignInResponseDto(
             accessToken,
             expiresAt,
+            refreshInfo.employeeName,
             refreshInfo.accountRoleName,
             refreshInfo.employeeRoleName
         )
