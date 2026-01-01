@@ -35,7 +35,7 @@ data class Account(
         name = "password_hash",
         nullable = false,
         length = 255,
-        columnDefinition = "nvarchar(255) COLLATE Latin1_General_100_CI_AS_SC"
+        columnDefinition = "nvarchar(255) COLLATE Latin1_General_100_CS_AS_SC"
     )
     val passwordHash: String,
 

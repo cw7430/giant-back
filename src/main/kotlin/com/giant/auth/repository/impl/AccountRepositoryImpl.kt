@@ -12,9 +12,11 @@ import com.querydsl.core.types.Projections
 import com.querydsl.core.types.dsl.BooleanExpression
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.stereotype.Repository
+import java.time.Clock
+import java.time.LocalDateTime
 
 @Repository
-class AccountRepositoryImpl (
+class AccountRepositoryImpl(
     private val queryFactory: JPAQueryFactory
 ) : AccountRepositoryCustom {
 
@@ -57,5 +59,40 @@ class AccountRepositoryImpl (
 
     override fun findRefreshInfoByAccountId(accountId: Long): SignInDto? =
         findSignInInfo(QAccount.account.accountId.eq(accountId))
+
+    override fun existsByUserName(userName: String): Boolean? =
+        queryFactory.selectOne()
+            .from(QAccount.account)
+            .where(QAccount.account.userName.eq(userName))
+            .fetchFirst() != null
+
+    override fun findPasswordHashByAccountId(accountId: Long): String? =
+        queryFactory.select(QAccount.account.passwordHash)
+            .from(QAccount.account)
+            .where(QAccount.account.accountId.eq(accountId))
+            .fetchOne()
+
+    override fun updateAccount(
+        accountId: Long,
+        userName: String,
+        phoneNumber: String,
+        email: String
+    ): Long =
+        queryFactory
+            .update(QAccount.account)
+            .set(QAccount.account.userName, userName)
+            .set(QAccount.account.phoneNumber, phoneNumber)
+            .set(QAccount.account.email, email)
+            .set(QAccount.account.updatedAt, LocalDateTime.now(Clock.systemUTC()))
+            .where(QAccount.account.accountId.eq(accountId))
+            .execute()
+
+    override fun updatePassword(accountId: Long, passwordHash: String): Long =
+        queryFactory
+            .update(QAccount.account)
+            .set(QAccount.account.passwordHash, passwordHash)
+            .set(QAccount.account.updatedAt, LocalDateTime.now(Clock.systemUTC()))
+            .where(QAccount.account.accountId.eq(accountId))
+            .execute()
 
 }

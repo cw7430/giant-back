@@ -57,6 +57,12 @@ data class EmployeeProfile(
     @JoinColumn(name = "position_id", nullable = false, foreignKey = ForeignKey(name = "fk_employee_position"))
     val position: Position,
 
+    @Column(name = "created_by", nullable = false)
+    val createdBy: Long,
+
+    @Column(name = "updated_by")
+    val updatedBy: Long? = null,
+
     @Column(
         name = "created_at",
         nullable = false,
