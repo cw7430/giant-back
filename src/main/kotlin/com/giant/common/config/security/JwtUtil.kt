@@ -73,7 +73,6 @@ class JwtUtil(private val jwtProvider: JwtProvider) {
         removeCookie(response, "refreshToken", true)
     }
 
-
     /**
      * Claim 추출
      */
@@ -98,8 +97,7 @@ class JwtUtil(private val jwtProvider: JwtProvider) {
 
         return ClaimDto(
             userId = claims.subject,
-            accountRole = claims.get(ClaimElement.ACCOUNT_ROLE.element, String::class.java),
-            employeeRole = claims.get(ClaimElement.EMPLOYEE_ROLE.element, String::class.java)
+            accountRole = claims.get(ClaimElement.ACCOUNT_ROLE.element, String::class.java)
         )
     }
 

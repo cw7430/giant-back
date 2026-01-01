@@ -11,7 +11,6 @@ import java.time.LocalDateTime
     name = "employee_profile",
     schema = "employee",
     indexes = [
-        Index(name = "idx_employee_account_id", columnList = "account_id"),
         Index(name = "idx_employee_team_id", columnList = "team_id"),
         Index(name = "idx_employee_role_id", columnList = "employee_role_id"),
         Index(name = "idx_employee_position_id", columnList = "position_id")
@@ -21,12 +20,12 @@ import java.time.LocalDateTime
 data class EmployeeProfile(
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    val employeeId: Long = 0,
+    @Column(name = "id")
+    val id: Long,
 
+    @MapsId
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id", nullable = false, foreignKey = ForeignKey(name = "fk_employee_account"))
+    @JoinColumn(name = "id", nullable = false, foreignKey = ForeignKey(name = "fk_employee_account"))
     val account: Account,
 
     @Column(
@@ -34,7 +33,7 @@ data class EmployeeProfile(
         nullable = false,
         unique = true,
         length = 255,
-        columnDefinition = "nvarchar(255)"
+        columnDefinition = "nvarchar(255) COLLATE Latin1_General_100_CI_AS_SC"
     )
     val employeeCode: String,
 
@@ -42,20 +41,9 @@ data class EmployeeProfile(
         name = "employee_name",
         nullable = false,
         length = 255,
-        columnDefinition = "nvarchar(255)"
+        columnDefinition = "nvarchar(255) COLLATE Latin1_General_100_CI_AS_SC"
     )
     val employeeName: String,
-
-    @Column(
-        name = "phone_number",
-        nullable = false,
-        length = 15,
-        columnDefinition = "nvarchar(15)"
-    )
-    val phoneNumber: String,
-
-    @Column(name = "email", nullable = false, length = 255, columnDefinition = "nvarchar(255)")
-    val email: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id", nullable = false, foreignKey = ForeignKey(name = "fk_employee_team"))

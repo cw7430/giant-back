@@ -13,13 +13,10 @@ data class Department(
         name = "department_name",
         nullable = false,
         unique = true,
-        columnDefinition = "nvarchar(255)",
+        columnDefinition = "nvarchar(255) COLLATE Latin1_General_100_CI_AS_SC",
         length = 255
     )
     val departmentName: String,
-
-    @Column(name = "department_head_id")
-    val departmentHeadId: Long? = null,
 
     @OneToMany(mappedBy = "department", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     val teams: MutableList<Team> = mutableListOf()

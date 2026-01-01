@@ -34,8 +34,7 @@ class AuthService (
 
         val accessToken = jwtProvider.generateAccessToken(
             signInInfo.accountId.toString(),
-            signInInfo.accountRoleId.toString(),
-            signInInfo.employeeRoleId.toString()
+            signInInfo.accountRoleId.toString()
         )
 
         val expiresAt = jwtUtil.extractExpirationFromAccessToken(accessToken)
@@ -65,8 +64,7 @@ class AuthService (
 
         val accessToken = jwtProvider.generateAccessToken(
             refreshInfo.accountId.toString(),
-            refreshInfo.accountRoleId.toString(),
-            refreshInfo.employeeRoleId.toString()
+            refreshInfo.accountRoleId.toString()
         )
 
         val expiresAt = jwtUtil.extractExpirationFromAccessToken(accessToken)

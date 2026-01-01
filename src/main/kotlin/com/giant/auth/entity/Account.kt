@@ -35,9 +35,25 @@ data class Account(
         name = "password_hash",
         nullable = false,
         length = 255,
-        columnDefinition = "nvarchar(255)"
+        columnDefinition = "nvarchar(255) COLLATE Latin1_General_100_CI_AS_SC"
     )
     val passwordHash: String,
+
+    @Column(
+        name = "phone_number",
+        nullable = false,
+        length = 15,
+        columnDefinition = "nvarchar(15) COLLATE Latin1_General_100_CI_AS_SC"
+    )
+    val phoneNumber: String,
+
+    @Column(
+        name = "email",
+        nullable = false,
+        length = 255,
+        columnDefinition = "nvarchar(255) COLLATE Latin1_General_100_CI_AS_SC"
+    )
+    val email: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(

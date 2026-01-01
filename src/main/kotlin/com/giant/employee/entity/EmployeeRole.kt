@@ -14,7 +14,7 @@ data class EmployeeRole(
         nullable = false,
         unique = true,
         length = 255,
-        columnDefinition = "nvarchar(255)"
+        columnDefinition = "nvarchar(255) COLLATE Latin1_General_100_CI_AS_SC"
     )
     val employeeRoleName: String,
 
