@@ -26,14 +26,13 @@ class JwtProvider(
     /**
      * AccessToken 생성
      */
-    fun generateAccessToken(userId: String, accountRole: String, employeeRole: String): String {
+    fun generateAccessToken(userId: String, accountRole: String): String {
         val now = Date()
         val expiry = Date(now.time + accessTokenExpireTime)
 
         return Jwts.builder()
             .subject(userId)
             .claim(ClaimElement.ACCOUNT_ROLE.element, accountRole)
-            .claim(ClaimElement.EMPLOYEE_ROLE.element, employeeRole)
             .issuedAt(now)
             .expiration(expiry)
             .signWith(accessSecretKey, Jwts.SIG.HS256)

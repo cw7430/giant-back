@@ -2,8 +2,6 @@ package com.giant.common.config.security
 
 import com.giant.common.api.code.ResponseCode
 import com.giant.common.api.exception.CustomException
-import com.giant.common.config.security.constant.ClaimElement
-import com.giant.common.config.security.dto.ClaimDto
 import com.giant.common.util.addCookie
 import com.giant.common.util.removeCookie
 import io.jsonwebtoken.Claims
@@ -73,7 +71,6 @@ class JwtUtil(private val jwtProvider: JwtProvider) {
         removeCookie(response, "refreshToken", true)
     }
 
-
     /**
      * Claim 추출
      */
@@ -88,20 +85,11 @@ class JwtUtil(private val jwtProvider: JwtProvider) {
         getClaims(extractAccessToken(request))
     }
 
-
     /**
-     * AccessToken 에서 claim 추출
+     * AccessToken 에서 userId 추출
      */
-    fun extractClaimsFromAccessToken(request: HttpServletRequest): ClaimDto {
-        val token = extractAccessToken(request)
-        val claims = getClaims(token)
-
-        return ClaimDto(
-            userId = claims.subject,
-            accountRole = claims.get(ClaimElement.ACCOUNT_ROLE.element, String::class.java),
-            employeeRole = claims.get(ClaimElement.EMPLOYEE_ROLE.element, String::class.java)
-        )
-    }
+    fun extractUserIdFromAccessToken(request: HttpServletRequest): String =
+        getClaims(extractAccessToken(request)).subject
 
     /**
      * AccessToken 에서 expiration 추출

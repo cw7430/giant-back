@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController
 @Tag(name = "Home Controller", description = "공통 API")
 class HomeController {
 
-    @GetMapping("/public/health-check")
+    @GetMapping("/health-check")
     @Operation(summary = "헬스 체크")
     @ApiResponses(
         ApiResponse(responseCode = "200", description = "조회 성공"),

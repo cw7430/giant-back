@@ -5,6 +5,8 @@ data class SignInDto (
     val passwordHash: String,
     val accountRoleId: Long,
     val accountRoleName: String,
-    val employeeRoleId: Long,
-    val employeeRoleName: String
+    val employeeName: String,
+    val employeeRoleName: String,
+    val departmentName: String,
+    val teamName: String
 )
