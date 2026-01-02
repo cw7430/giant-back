@@ -4,25 +4,25 @@ import jakarta.persistence.*
 
 @Entity
 @Table(name = "position", schema = "employee")
-data class Position(
+class Position(
     @Id
     @Column(name = "id", nullable = false)
-    val positionId: Long,
+    var positionId: Long = 0,
 
     @Column(
         name = "position_name",
         nullable = false,
         unique = true,
         length = 255,
-        columnDefinition = "nvarchar(255)"
+        columnDefinition = "nvarchar(255) COLLATE Latin1_General_100_CI_AS_SC"
     )
-    val positionName: String,
+    var positionName: String = "",
 
     @Column(name= "basic_salary", nullable = false)
-    val basicSalary: Long,
+    var basicSalary: Long = 0,
 
     @Column(name= "incentive_salary", nullable = false)
-    val incentiveSalary: Long,
+    var incentiveSalary: Long = 0,
 
     @OneToMany(mappedBy = "position", fetch = FetchType.LAZY)
     val employeeProfiles: MutableList<EmployeeProfile> = mutableListOf()

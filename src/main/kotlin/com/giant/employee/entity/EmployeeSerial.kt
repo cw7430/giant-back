@@ -4,7 +4,7 @@ import jakarta.persistence.*
 
 @Entity
 @Table(name = "\"serial\"", schema = "employee")
-data class EmployeeSerial(
+class EmployeeSerial(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,10 +16,10 @@ data class EmployeeSerial(
         nullable = false,
         unique = true,
         length = 255,
-        columnDefinition = "nvarchar(255)"
+        columnDefinition = "nvarchar(255) COLLATE Latin1_General_100_CI_AS_SC"
     )
-    val serialName: String,
+    var serialName: String = "",
 
     @Column(name = "serial_value", nullable = false)
-    val serialValue: Long
+    var serialValue: Long = 0
 )

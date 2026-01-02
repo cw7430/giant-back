@@ -11,63 +11,57 @@ import java.time.LocalDateTime
     name = "employee_profile",
     schema = "employee",
     indexes = [
-        Index(name = "idx_employee_account_id", columnList = "account_id"),
         Index(name = "idx_employee_team_id", columnList = "team_id"),
         Index(name = "idx_employee_role_id", columnList = "employee_role_id"),
         Index(name = "idx_employee_position_id", columnList = "position_id")
     ]
 )
 @DynamicUpdate
-data class EmployeeProfile(
+class EmployeeProfile(
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    val employeeId: Long = 0,
+    @Column(name = "id")
+    var id: Long = 0,
 
+    @MapsId
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id", nullable = false, foreignKey = ForeignKey(name = "fk_employee_account"))
-    val account: Account,
+    @JoinColumn(name = "id", nullable = false, foreignKey = ForeignKey(name = "fk_employee_account"))
+    var account: Account? = null,
 
     @Column(
         name = "employee_code",
         nullable = false,
         unique = true,
         length = 255,
-        columnDefinition = "nvarchar(255)"
+        columnDefinition = "nvarchar(255) COLLATE Latin1_General_100_CI_AS_SC"
     )
-    val employeeCode: String,
+    var employeeCode: String = "",
 
     @Column(
         name = "employee_name",
         nullable = false,
         length = 255,
-        columnDefinition = "nvarchar(255)"
+        columnDefinition = "nvarchar(255) COLLATE Latin1_General_100_CI_AS_SC"
     )
-    val employeeName: String,
-
-    @Column(
-        name = "phone_number",
-        nullable = false,
-        length = 15,
-        columnDefinition = "nvarchar(15)"
-    )
-    val phoneNumber: String,
-
-    @Column(name = "email", nullable = false, length = 255, columnDefinition = "nvarchar(255)")
-    val email: String,
+    var employeeName: String = "",
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id", nullable = false, foreignKey = ForeignKey(name = "fk_employee_team"))
-    val team: Team,
+    var team: Team? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_role_id", nullable = false, foreignKey = ForeignKey(name = "fk_employee_role"))
-    val employeeRole: EmployeeRole,
+    var employeeRole: EmployeeRole? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "position_id", nullable = false, foreignKey = ForeignKey(name = "fk_employee_position"))
-    val position: Position,
+    var position: Position? = null,
+
+    @Column(name = "created_by", nullable = false, updatable = false)
+    var createdBy: Long = 0,
+
+    @Column(name = "updated_by")
+    var updatedBy: Long? = 0,
 
     @Column(
         name = "created_at",

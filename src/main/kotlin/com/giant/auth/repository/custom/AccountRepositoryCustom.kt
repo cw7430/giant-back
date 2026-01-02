@@ -4,4 +4,5 @@ import com.giant.auth.dto.SignInDto
 
 interface AccountRepositoryCustom {
     fun findSignInInfoByUserName(userName: String): SignInDto?
+    fun findRefreshInfoByAccountId(accountId: Long): SignInDto?
 }
