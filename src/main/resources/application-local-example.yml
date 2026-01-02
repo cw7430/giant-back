@@ -23,7 +23,7 @@ spring:
 jwt:
   access:
     secret: my-secret-key # 👉 Set your access token secret key here
-    expiration: 3m
+    expiration: 30m
   refresh:
     secret: my-secret-key # 👉 Set your refresh token secret key password here
     expiration: 14d

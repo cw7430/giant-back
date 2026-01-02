@@ -32,10 +32,11 @@ class WebSecurityConfig(
                 auth
                     .requestMatchers(
                         "/swagger-ui/**", "api-docs/**", "/api/v1/health-check",
-                        "/api/v1/auth/sign-in", "/api/v1/auth/sign-out", "/api/v1/auth/check-user"
+                        "/api/v1/auth/sign-in", "/api/v1/auth/sign-out", "/api/v1/auth/check-user",
+                        "/api/v1/auth/refresh"
                     ).permitAll()
                     .requestMatchers(
-                        "/api/v1/auth/refresh", "/api/v1/auth/account-info", "/api/v1/auth/change-password"
+                         "/api/v1/auth/account-info", "/api/v1/auth/change-password"
                     ).hasAnyRole("USER", "ADMIN")
                     .requestMatchers(
                         "/api/v1/admin/**"
@@ -45,6 +46,7 @@ class WebSecurityConfig(
                 jwtAuthenticationFilter,
                 UsernamePasswordAuthenticationFilter::class.java
             )
+            .formLogin { form -> form.disable() }
             .build()
     }
 
