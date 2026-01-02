@@ -17,16 +17,16 @@ import java.time.LocalDateTime
     ]
 )
 @DynamicUpdate
-data class EmployeeProfile(
+class EmployeeProfile(
 
     @Id
     @Column(name = "id")
-    val id: Long,
+    var id: Long = 0,
 
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id", nullable = false, foreignKey = ForeignKey(name = "fk_employee_account"))
-    val account: Account,
+    var account: Account? = null,
 
     @Column(
         name = "employee_code",
@@ -35,7 +35,7 @@ data class EmployeeProfile(
         length = 255,
         columnDefinition = "nvarchar(255) COLLATE Latin1_General_100_CI_AS_SC"
     )
-    val employeeCode: String,
+    var employeeCode: String = "",
 
     @Column(
         name = "employee_name",
@@ -43,25 +43,25 @@ data class EmployeeProfile(
         length = 255,
         columnDefinition = "nvarchar(255) COLLATE Latin1_General_100_CI_AS_SC"
     )
-    val employeeName: String,
+    var employeeName: String = "",
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id", nullable = false, foreignKey = ForeignKey(name = "fk_employee_team"))
-    val team: Team,
+    var team: Team? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_role_id", nullable = false, foreignKey = ForeignKey(name = "fk_employee_role"))
-    val employeeRole: EmployeeRole,
+    var employeeRole: EmployeeRole? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "position_id", nullable = false, foreignKey = ForeignKey(name = "fk_employee_position"))
-    val position: Position,
+    var position: Position? = null,
 
-    @Column(name = "created_by", nullable = false)
-    val createdBy: Long,
+    @Column(name = "created_by", nullable = false, updatable = false)
+    var createdBy: Long = 0,
 
     @Column(name = "updated_by")
-    val updatedBy: Long? = null,
+    var updatedBy: Long? = 0,
 
     @Column(
         name = "created_at",

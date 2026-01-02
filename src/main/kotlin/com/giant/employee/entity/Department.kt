@@ -4,10 +4,10 @@ import jakarta.persistence.*
 
 @Entity
 @Table(name = "department", schema = "employee")
-data class Department(
+class Department(
     @Id
     @Column(name = "id", nullable = false)
-    val departmentId: Long,
+    var departmentId: Long = 0,
 
     @Column(
         name = "department_name",
@@ -16,7 +16,7 @@ data class Department(
         columnDefinition = "nvarchar(255) COLLATE Latin1_General_100_CI_AS_SC",
         length = 255
     )
-    val departmentName: String,
+    var departmentName: String = "",
 
     @OneToMany(mappedBy = "department", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     val teams: MutableList<Team> = mutableListOf()

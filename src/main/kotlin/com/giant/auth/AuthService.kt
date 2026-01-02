@@ -1,6 +1,9 @@
 package com.giant.auth
 
+import com.giant.auth.dto.request.CheckUserNameDuplicateRequestDto
 import com.giant.auth.dto.request.SignInRequestDto
+import com.giant.auth.dto.request.UpdateAccountInfoRequestDto
+import com.giant.auth.dto.request.UpdatePasswordRequestDto
 import com.giant.auth.dto.response.RefreshRequestDto
 import com.giant.auth.dto.response.SignInResponseDto
 import com.giant.auth.repository.AccountRepository
@@ -12,9 +15,10 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
-class AuthService (
+class AuthService(
     private val accountRepository: AccountRepository,
     private val passwordEncoder: PasswordEncoder,
     private val jwtProvider: JwtProvider,
@@ -28,7 +32,7 @@ class AuthService (
             signInInfo == null || !passwordEncoder.matches(
                 signInRequestDto.password, signInInfo.passwordHash
             )
-            )  throw CustomException(ResponseCode.LOGIN_ERROR)
+        ) throw CustomException(ResponseCode.LOGIN_ERROR)
 
         if (signInInfo.accountRoleId == 3L) {
             throw CustomException(ResponseCode.FORBIDDEN)
@@ -60,7 +64,11 @@ class AuthService (
         jwtUtil.removeRefreshTokenFromCookie(response)
     }
 
-    fun refreshAccessToken(request: HttpServletRequest, response: HttpServletResponse, refreshRequestDto: RefreshRequestDto): SignInResponseDto {
+    fun refreshAccessToken(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+        refreshRequestDto: RefreshRequestDto
+    ): SignInResponseDto {
         val accountId = jwtUtil.extractUserIdFromRefreshToken(request).toLong()
         val refreshInfo =
             accountRepository.findRefreshInfoByAccountId(accountId) ?: throw CustomException(ResponseCode.UNAUTHORIZED)
@@ -76,7 +84,7 @@ class AuthService (
 
         val expiresAt = jwtUtil.extractExpirationFromAccessToken(accessToken)
 
-        if(refreshRequestDto.isAuto) jwtUtil.addRefreshTokenToCookie(
+        if (refreshRequestDto.isAuto) jwtUtil.addRefreshTokenToCookie(
             response,
             jwtProvider.generateRefreshToken(accountId.toString(), true),
             true
@@ -89,5 +97,61 @@ class AuthService (
             refreshInfo.accountRoleName,
             refreshInfo.employeeRoleName
         )
+    }
+
+    fun checkUserNameDuplicate(
+        checkUserNameDuplicateRequestDto: CheckUserNameDuplicateRequestDto
+    ) {
+        if (accountRepository.existsByUserName(checkUserNameDuplicateRequestDto.userName))
+            throw (CustomException(ResponseCode.DUPLICATE_RESOURCE))
+    }
+
+    @Transactional
+    fun updateAccountInfo(
+        request: HttpServletRequest,
+        updateAccountInfoRequestDto: UpdateAccountInfoRequestDto
+    ) {
+        val accountId = jwtUtil.extractUserIdFromAccessToken(request).toLong()
+
+        if (accountRepository.existsByUserName(updateAccountInfoRequestDto.userName))
+            throw (CustomException(ResponseCode.DUPLICATE_RESOURCE))
+
+        val account = accountRepository.findById(accountId)
+            .orElseThrow { CustomException(ResponseCode.RESOURCE_NOT_FOUND) }
+
+        if (!passwordEncoder.matches(
+                updateAccountInfoRequestDto.password,
+                account.passwordHash
+            )
+        ) throw CustomException(ResponseCode.UNAUTHORIZED)
+
+        account.updateAccountInfo(
+            updateAccountInfoRequestDto.userName,
+            updateAccountInfoRequestDto.phoneNumber,
+            updateAccountInfoRequestDto.email
+        )
+        accountRepository.save(account)
+    }
+
+    @Transactional
+    fun updatePassword(
+        request: HttpServletRequest,
+        updatePasswordRequestDto: UpdatePasswordRequestDto
+    ) {
+        val accountId = jwtUtil.extractUserIdFromAccessToken(request).toLong()
+
+        val account = accountRepository.findById(accountId)
+            .orElseThrow { CustomException(ResponseCode.RESOURCE_NOT_FOUND) }
+
+        if (!passwordEncoder.matches(
+                updatePasswordRequestDto.prevPassword,
+                account.passwordHash
+            )
+        ) throw CustomException(ResponseCode.UNAUTHORIZED)
+
+        val newPasswordHash = passwordEncoder.encode(updatePasswordRequestDto.newPassword)
+
+        account.updatePassword(newPasswordHash)
+        accountRepository.save(account)
     }
 }

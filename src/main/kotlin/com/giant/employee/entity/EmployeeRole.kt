@@ -4,10 +4,10 @@ import jakarta.persistence.*
 
 @Entity
 @Table(name = "employee_role", schema = "employee")
-data class EmployeeRole(
+class EmployeeRole(
     @Id
     @Column(name = "id", nullable = false)
-    val employeeRoleId: Long,
+    var employeeRoleId: Long = 0,
 
     @Column(
         name = "role_name",
@@ -16,7 +16,7 @@ data class EmployeeRole(
         length = 255,
         columnDefinition = "nvarchar(255) COLLATE Latin1_General_100_CI_AS_SC"
     )
-    val employeeRoleName: String,
+    var employeeRoleName: String = "",
 
     @OneToMany(mappedBy = "employeeRole", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     val employees: MutableList<EmployeeProfile> = mutableListOf()

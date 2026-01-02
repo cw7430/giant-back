@@ -10,14 +10,14 @@ import jakarta.persistence.*
         Index(name = "idx_team_department_id", columnList = "department_id")
     ]
 )
-data class Team(
+class Team(
     @Id
     @Column(name = "id", nullable = false)
-    val teamId: Long,
+    var teamId: Long = 0,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id", nullable = false, foreignKey = ForeignKey(name = "fk_team_department"))
-    val department: Department,
+    var department: Department? = null,
 
     @Column(
         name = "team_name",
@@ -26,7 +26,7 @@ data class Team(
         length = 255,
         columnDefinition = "nvarchar(255) COLLATE Latin1_General_100_CI_AS_SC"
     )
-    val teamName: String,
+    var teamName: String = "",
 
     @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
     val employees: MutableList<EmployeeProfile> = mutableListOf()

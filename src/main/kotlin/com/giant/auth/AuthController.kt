@@ -1,6 +1,9 @@
 package com.giant.auth
 
+import com.giant.auth.dto.request.CheckUserNameDuplicateRequestDto
 import com.giant.auth.dto.request.SignInRequestDto
+import com.giant.auth.dto.request.UpdateAccountInfoRequestDto
+import com.giant.auth.dto.request.UpdatePasswordRequestDto
 import com.giant.auth.dto.response.RefreshRequestDto
 import com.giant.common.api.response.ErrorResponseDto
 import com.giant.common.api.response.ResponseDto
@@ -15,6 +18,7 @@ import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -80,5 +84,35 @@ class AuthController (private val authService: AuthService) {
         @RequestBody refreshRequestDto: RefreshRequestDto
     ): ResponseEntity<ResponseDto> =
         ResponseEntity.ok(SuccessResponseDto.WithResult(authService.refreshAccessToken(request, response, refreshRequestDto)))
+
+
+    @PostMapping("/check-user")
+    @Operation(summary = "계정 중복 체크")
+    fun checkUserNameDuplicate (
+        @RequestBody @Valid checkUserNameDuplicateRequestDto: CheckUserNameDuplicateRequestDto
+    ): ResponseEntity<ResponseDto> {
+        authService.checkUserNameDuplicate(checkUserNameDuplicateRequestDto)
+        return ResponseEntity.ok(SuccessResponseDto.Simple)
+    }
+
+    @PutMapping("/account-info")
+    @Operation(summary = "계정 정보 수정")
+    fun updateAccountInfo(
+        request: HttpServletRequest,
+        updateAccountInfoRequestDto: UpdateAccountInfoRequestDto
+    ): ResponseEntity<ResponseDto> {
+        authService.updateAccountInfo(request, updateAccountInfoRequestDto)
+        return ResponseEntity.ok(SuccessResponseDto.Simple)
+    }
+
+    @PutMapping("/change-password")
+    @Operation(summary = "비밀번호 수정")
+    fun updatePassword(
+        request: HttpServletRequest,
+        @RequestBody @Valid updatePasswordRequestDto: UpdatePasswordRequestDto
+    ): ResponseEntity<ResponseDto> {
+        authService.updatePassword(request, updatePasswordRequestDto)
+        return ResponseEntity.ok(SuccessResponseDto.Simple)
+    }
 
 }
