@@ -1,4 +1,4 @@
-package com.giant.auth.dto.response
+package com.giant.auth.dto.request
 
 data class RefreshRequestDto (
     val isAuto: Boolean = false

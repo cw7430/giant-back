@@ -1,10 +1,6 @@
 package com.giant.auth
 
-import com.giant.auth.dto.request.CheckUserNameDuplicateRequestDto
-import com.giant.auth.dto.request.SignInRequestDto
-import com.giant.auth.dto.request.UpdateAccountInfoRequestDto
-import com.giant.auth.dto.request.UpdatePasswordRequestDto
-import com.giant.auth.dto.response.RefreshRequestDto
+import com.giant.auth.dto.request.*
 import com.giant.common.api.response.ErrorResponseDto
 import com.giant.common.api.response.ResponseDto
 import com.giant.common.api.response.SuccessResponseDto
@@ -17,11 +13,7 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/auth")

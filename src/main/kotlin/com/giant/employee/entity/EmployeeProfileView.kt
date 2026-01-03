@@ -1,6 +1,9 @@
 package com.giant.employee.entity
 
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 import org.hibernate.annotations.Immutable
 import java.time.LocalDateTime
 
@@ -16,22 +19,34 @@ class EmployeeProfileView (
     val employeeId: Long,
 
     @Column(name = "employee_code")
-    val employeeCode: String?,
+    val employeeCode: String,
 
     @Column(name = "employee_name")
-    val employeeName: String?,
+    val employeeName: String,
+
+    @Column(name = "position_id")
+    val positionId: Long,
 
     @Column(name = "position_name")
-    val positionName: String?,
+    val positionName: String,
+
+    @Column(name = "employee_role_id")
+    val employeeRoleId: Long,
 
     @Column(name = "employee_role_name")
-    val employeeRoleName: String?,
+    val employeeRoleName: String,
+
+    @Column(name = "department_id")
+    val departmentId: Long,
 
     @Column(name = "department_name")
-    val departmentName: String?,
+    val departmentName: String,
+
+    @Column(name = "team_id")
+    val teamId: Long,
 
     @Column(name = "team_name")
-    val teamName: String?,
+    val teamName: String,
 
     @Column(name = "phone_number")
     val phoneNumber: String?,
@@ -46,10 +61,10 @@ class EmployeeProfileView (
     val updatedEmployeeName: String?,
 
     @Column(name = "created_at")
-    val createdAt: LocalDateTime?,
+    val createdAt: LocalDateTime,
 
     @Column(name = "updated_at")
-    val updatedAt: LocalDateTime?,
+    val updatedAt: LocalDateTime,
 
     @Column(name = "left_at")
     val leftAt: LocalDateTime?
