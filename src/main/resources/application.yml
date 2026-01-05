@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: giant
+  datasource:
+    driver-class-name: org.postgresql.Driver
+  jackson:
+    time-zone: UTC
+  profiles:
+    active: local
+
+server:
+  port: 8080
+
