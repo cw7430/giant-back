@@ -31,7 +31,7 @@ import java.time.LocalDateTime;
 public class EmployeeProfile {
     @Id
     @Column(name="id")
-    private Long id;
+    private Long employeeId;
 
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)

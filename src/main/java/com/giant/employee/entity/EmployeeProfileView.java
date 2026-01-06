@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class EmployeeProfileView {
     @Id
     @Column(name = "id")
-    private Long id;
+    private Long employeeId;
 
     @Column(name = "employee_code")
     private String employeeCode;
