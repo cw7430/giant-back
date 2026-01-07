@@ -1,5 +1,6 @@
 package com.giant.auth.entity;
 
+import com.giant.employee.entity.EmployeeProfile;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -10,7 +11,13 @@ import java.time.Clock;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "account", schema = "auth")
+@Table(
+        name = "account",
+        schema = "auth",
+        indexes = {
+                @Index(name="fk_account_role", columnList = "account_role_id")
+        }
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -70,6 +77,9 @@ public class Account {
             columnDefinition = "TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'UTC')"
     )
     private LocalDateTime updatedAt;
+
+    @OneToOne(mappedBy = "account")
+    private EmployeeProfile employeeProfile;
 
     @PrePersist
     protected void onCreate() {
