@@ -51,7 +51,7 @@ public class AuthService {
         Long accountId = jwtUtil.extractUserIdFromRefreshToken(request);
         SignInDto refreshInfo = accountRepository.findRefreshInfoByAccountId(accountId);
 
-        if (refreshInfo == null) throw new CustomException(ResponseCode.LOGIN_ERROR);
+        if (refreshInfo == null) throw new CustomException(ResponseCode.UNAUTHORIZED);
         authUtil.validateAccountRole(refreshInfo);
 
         String accessToken = jwtProvider.generateAccessToken(refreshInfo.accountId(), refreshInfo.accountRoleId());
