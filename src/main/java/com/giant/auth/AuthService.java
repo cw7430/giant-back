@@ -1,10 +1,7 @@
 package com.giant.auth;
 
 import com.giant.auth.dto.SignInDto;
-import com.giant.auth.dto.request.CheckUserRequestDto;
-import com.giant.auth.dto.request.RefreshRequestDto;
-import com.giant.auth.dto.request.SignInRequestDto;
-import com.giant.auth.dto.request.UpdateAccountInfoRequestDto;
+import com.giant.auth.dto.request.*;
 import com.giant.auth.dto.response.SignInResponseDto;
 import com.giant.auth.entity.Account;
 import com.giant.auth.repository.AccountRepository;
@@ -80,28 +77,48 @@ public class AuthService {
     }
 
     @Transactional
-    public void updateAccountInfo(
+    public void updateAccount(
             HttpServletRequest request,
-            UpdateAccountInfoRequestDto updateAccountInfoRequestDto
+            UpdateAccountRequestDto updateAccountRequestDto
     ) {
         Long accountId = jwtUtil.extractUserIdFromAccessToken(request);
 
-        if (accountRepository.existsByUserName(updateAccountInfoRequestDto.userName()))
+        if (accountRepository.existsByUserName(updateAccountRequestDto.userName()))
             throw new CustomException(ResponseCode.DUPLICATE_RESOURCE);
 
         Account account = accountRepository
                 .findById(accountId).orElseThrow(() -> new CustomException(ResponseCode.RESOURCE_NOT_FOUND));
 
         if(!passwordEncoder.matches(
-                updateAccountInfoRequestDto.password(), account.getPasswordHash()
+                updateAccountRequestDto.password(), account.getPasswordHash()
         )) throw new CustomException(ResponseCode.UNAUTHORIZED);
 
-        Account updatedAccount = account.updateAccountInfo(
-                updateAccountInfoRequestDto.userName(),
-                updateAccountInfoRequestDto.phoneNumber(),
-                updateAccountInfoRequestDto.email()
+        Account updatedAccount = account.updateAccount(
+                updateAccountRequestDto.userName(),
+                updateAccountRequestDto.phoneNumber(),
+                updateAccountRequestDto.email()
         );
 
         log.info("Account information updated successfully. Updated account ID: {}", updatedAccount.getAccountId());
+    }
+
+    public void updatePassword(
+            HttpServletRequest request,
+            UpdatePasswordRequestDto updatePasswordRequestDto
+    ) {
+        Long accountId = jwtUtil.extractUserIdFromAccessToken(request);
+
+        Account account = accountRepository
+                .findById(accountId).orElseThrow(() -> new CustomException(ResponseCode.RESOURCE_NOT_FOUND));
+
+        if(!passwordEncoder.matches(
+                updatePasswordRequestDto.prevPassword(), account.getPasswordHash()
+        )) throw new CustomException(ResponseCode.UNAUTHORIZED);
+
+        Account updatedAccount = account.updatePassword(
+                updatePasswordRequestDto.newPassword()
+        );
+
+        log.info("Password updated successfully. Updated account ID: {}", updatedAccount.getAccountId());
     }
 }

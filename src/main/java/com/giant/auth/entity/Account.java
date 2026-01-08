@@ -107,7 +107,7 @@ public class Account {
         return account;
     }
 
-    public Account updateAccountInfo(
+    public Account updateAccount(
             String userName,
             String phoneNumber,
             String email

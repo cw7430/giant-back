@@ -1,10 +1,7 @@
 package com.giant.auth;
 
 import com.giant.auth.doc.SignInSuccessResponseDoc;
-import com.giant.auth.dto.request.CheckUserRequestDto;
-import com.giant.auth.dto.request.RefreshRequestDto;
-import com.giant.auth.dto.request.SignInRequestDto;
-import com.giant.auth.dto.request.UpdateAccountInfoRequestDto;
+import com.giant.auth.dto.request.*;
 import com.giant.common.api.doc.error.ErrorResponseDoc;
 import com.giant.common.api.doc.success.SuccessResponseDoc;
 import com.giant.common.api.response.ResponseDto;
@@ -112,7 +109,7 @@ public class AuthController {
         return ResponseEntity.ok(SuccessResponseDto.ok());
     }
 
-    @PutMapping("/account-info")
+    @PutMapping("/account")
     @Operation(summary = "계정 정보 수정")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "수정 성공", content = @Content(
@@ -134,11 +131,38 @@ public class AuthController {
                     schema = @Schema(implementation = ErrorResponseDoc.InternalServerError.class)
             ))
     })
-    public ResponseEntity<ResponseDto> updateAccountInfo(
+    public ResponseEntity<ResponseDto> updateAccount(
             HttpServletRequest request,
-            @RequestBody @Valid UpdateAccountInfoRequestDto updateAccountInfoRequestDto
+            @RequestBody @Valid UpdateAccountRequestDto updateAccountRequestDto
     ) {
-        authService.updateAccountInfo(request, updateAccountInfoRequestDto);
+        authService.updateAccount(request, updateAccountRequestDto);
+        return ResponseEntity.ok(SuccessResponseDto.ok());
+    }
+
+    @PutMapping("/password")
+    @Operation(summary = "비밀번호 수정")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "수정 성공", content = @Content(
+                    schema = @Schema(implementation = SuccessResponseDoc.class)
+            )),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDoc.BadRequest.class)
+            )),
+            @ApiResponse(responseCode = "401", description = "인증 오류", content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDoc.Unauthorized.class)
+            )),
+            @ApiResponse(responseCode = "404", description = "조회 오류", content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDoc.ResourceNotFound.class)
+            )),
+            @ApiResponse(responseCode = "500", description = "기타오류", content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDoc.InternalServerError.class)
+            ))
+    })
+    public ResponseEntity<ResponseDto> updatePassword(
+            HttpServletRequest request,
+            @RequestBody @Valid UpdatePasswordRequestDto updatePasswordRequestDto
+    ) {
+        authService.updatePassword(request, updatePasswordRequestDto);
         return ResponseEntity.ok(SuccessResponseDto.ok());
     }
 }

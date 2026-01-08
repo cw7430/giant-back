@@ -4,7 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
-public record UpdateAccountInfoRequestDto(
+public record UpdateAccountRequestDto(
         @NotBlank(message = "비밀번호를 입력해주세요.")
         String password,
 
