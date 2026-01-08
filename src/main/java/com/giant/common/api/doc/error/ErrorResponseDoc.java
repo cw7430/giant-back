@@ -30,7 +30,7 @@ public class ErrorResponseDoc {
     /** 401 Unauthorized */
     @Getter
     public static class LoginError {
-        @Schema(example = "UA")
+        @Schema(example = "LGE")
         private final String code = null;
         @Schema(example = "아이디 또는 비밀번호가 잘못되었습니다.")
         private final String message = null;

@@ -32,13 +32,13 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "로그인 성공", content = @Content(
                     schema = @Schema(implementation = SignInSuccessResponseDoc.class)
             )),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content(
+            @ApiResponse(responseCode = "400", description = "입력 값 오류", content = @Content(
                     schema = @Schema(implementation = ErrorResponseDoc.BadRequest.class)
             )),
             @ApiResponse(responseCode = "401", description = "로그인 오류", content = @Content(
                     schema = @Schema(implementation = ErrorResponseDoc.LoginError.class)
             )),
-            @ApiResponse(responseCode = "500", description = "기타오류", content = @Content(
+            @ApiResponse(responseCode = "500", description = "기타 오류", content = @Content(
                     schema = @Schema(implementation = ErrorResponseDoc.InternalServerError.class)
             ))
     })
@@ -55,7 +55,7 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "로그아웃 성공", content = @Content(
                     schema = @Schema(implementation = SuccessResponseDoc.class)
             )),
-            @ApiResponse(responseCode = "500", description = "기타오류", content = @Content(
+            @ApiResponse(responseCode = "500", description = "기타 오류", content = @Content(
                     schema = @Schema(implementation = ErrorResponseDoc.InternalServerError.class)
             ))
     })
@@ -70,13 +70,13 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "토큰 재발급 성공", content = @Content(
                     schema = @Schema(implementation = SignInSuccessResponseDoc.class)
             )),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content(
+            @ApiResponse(responseCode = "400", description = "입력 값 오류", content = @Content(
                     schema = @Schema(implementation = ErrorResponseDoc.BadRequest.class)
             )),
             @ApiResponse(responseCode = "401", description = "인증 오류", content = @Content(
                     schema = @Schema(implementation = ErrorResponseDoc.Unauthorized.class)
             )),
-            @ApiResponse(responseCode = "500", description = "기타오류", content = @Content(
+            @ApiResponse(responseCode = "500", description = "기타 오류", content = @Content(
                     schema = @Schema(implementation = ErrorResponseDoc.InternalServerError.class)
             ))
     })
@@ -94,13 +94,13 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "중복체크 성공", content = @Content(
                     schema = @Schema(implementation = SuccessResponseDoc.class)
             )),
-            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content(
+            @ApiResponse(responseCode = "400", description = "입력 값 오류", content = @Content(
                     schema = @Schema(implementation = ErrorResponseDoc.BadRequest.class)
             )),
             @ApiResponse(responseCode = "409", description = "중복", content = @Content(
                     schema = @Schema(implementation = ErrorResponseDoc.DuplicateResource.class)
             )),
-            @ApiResponse(responseCode = "500", description = "기타오류", content = @Content(
+            @ApiResponse(responseCode = "500", description = "기타 오류", content = @Content(
                     schema = @Schema(implementation = ErrorResponseDoc.InternalServerError.class)
             ))
     })
@@ -127,7 +127,7 @@ public class AuthController {
             @ApiResponse(responseCode = "409", description = "아이디 중복", content = @Content(
                     schema = @Schema(implementation = ErrorResponseDoc.DuplicateResource.class)
             )),
-            @ApiResponse(responseCode = "500", description = "기타오류", content = @Content(
+            @ApiResponse(responseCode = "500", description = "기타 오류", content = @Content(
                     schema = @Schema(implementation = ErrorResponseDoc.InternalServerError.class)
             ))
     })
@@ -154,7 +154,7 @@ public class AuthController {
             @ApiResponse(responseCode = "404", description = "조회 오류", content = @Content(
                     schema = @Schema(implementation = ErrorResponseDoc.ResourceNotFound.class)
             )),
-            @ApiResponse(responseCode = "500", description = "기타오류", content = @Content(
+            @ApiResponse(responseCode = "500", description = "기타 오류", content = @Content(
                     schema = @Schema(implementation = ErrorResponseDoc.InternalServerError.class)
             ))
     })
