@@ -4,6 +4,7 @@ import com.giant.auth.doc.SignInSuccessResponseDoc;
 import com.giant.auth.dto.request.CheckUserRequestDto;
 import com.giant.auth.dto.request.RefreshRequestDto;
 import com.giant.auth.dto.request.SignInRequestDto;
+import com.giant.auth.dto.request.UpdateAccountInfoRequestDto;
 import com.giant.common.api.doc.error.ErrorResponseDoc;
 import com.giant.common.api.doc.success.SuccessResponseDoc;
 import com.giant.common.api.response.ResponseDto;
@@ -19,10 +20,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -99,6 +97,9 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "중복체크 성공", content = @Content(
                     schema = @Schema(implementation = SuccessResponseDoc.class)
             )),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDoc.BadRequest.class)
+            )),
             @ApiResponse(responseCode = "409", description = "중복", content = @Content(
                     schema = @Schema(implementation = ErrorResponseDoc.DuplicateResource.class)
             )),
@@ -108,6 +109,36 @@ public class AuthController {
     })
     public ResponseEntity<ResponseDto> checkUserNameDuplicate(@RequestBody @Valid CheckUserRequestDto checkUserRequestDto) {
         authService.checkUserNameDuplicate(checkUserRequestDto);
+        return ResponseEntity.ok(SuccessResponseDto.ok());
+    }
+
+    @PutMapping("/account-info")
+    @Operation(summary = "계정 정보 수정")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "수정 성공", content = @Content(
+                    schema = @Schema(implementation = SuccessResponseDoc.class)
+            )),
+            @ApiResponse(responseCode = "400", description = "입력값 오류", content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDoc.BadRequest.class)
+            )),
+            @ApiResponse(responseCode = "401", description = "인증 오류", content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDoc.Unauthorized.class)
+            )),
+            @ApiResponse(responseCode = "404", description = "조회 오류", content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDoc.ResourceNotFound.class)
+            )),
+            @ApiResponse(responseCode = "409", description = "아이디 중복", content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDoc.DuplicateResource.class)
+            )),
+            @ApiResponse(responseCode = "500", description = "기타오류", content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDoc.InternalServerError.class)
+            ))
+    })
+    public ResponseEntity<ResponseDto> updateAccountInfo(
+            HttpServletRequest request,
+            @RequestBody @Valid UpdateAccountInfoRequestDto updateAccountInfoRequestDto
+    ) {
+        authService.updateAccountInfo(request, updateAccountInfoRequestDto);
         return ResponseEntity.ok(SuccessResponseDto.ok());
     }
 }

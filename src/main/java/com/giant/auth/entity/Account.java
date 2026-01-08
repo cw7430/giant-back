@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
         name = "account",
         schema = "auth",
         indexes = {
-                @Index(name="fk_account_role", columnList = "account_role_id")
+                @Index(name = "fk_account_role", columnList = "account_role_id")
         }
 )
 @Getter
@@ -91,31 +91,40 @@ public class Account {
         updatedAt = LocalDateTime.now(Clock.systemUTC());
     }
 
-    public void create(
+    public static Account create(
             String userName,
             String passwordHash,
             String phoneNumber,
             String email,
             AccountRole accountRole
     ) {
+        Account account = new Account();
+        account.userName = userName;
+        account.passwordHash = passwordHash;
+        account.phoneNumber = phoneNumber;
+        account.email = email;
+        account.accountRole = accountRole;
+        return account;
+    }
+
+    public Account updateAccountInfo(
+            String userName,
+            String phoneNumber,
+            String email
+    ) {
         this.userName = userName;
-        this.passwordHash = passwordHash;
         this.phoneNumber = phoneNumber;
         this.email = email;
-        this.accountRole = accountRole;
+        return this;
     }
 
-    public void updateAccountInfo(String userName, String phoneNumber, String email) {
-        this.userName = userName;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-    }
-
-    public void updatePassword(String passwordHash) {
+    public Account updatePassword(String passwordHash) {
         this.passwordHash = passwordHash;
+        return this;
     }
 
-    public void updateRole(AccountRole accountRole) {
+    public Account updateRole(AccountRole accountRole) {
         this.accountRole = accountRole;
+        return this;
     }
 }
