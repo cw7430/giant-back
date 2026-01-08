@@ -1,9 +1,24 @@
 package com.giant.common.api.doc.error;
 
+import com.giant.common.api.type.ValidationError;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
+import java.util.List;
+
 public class ErrorResponseDoc {
+    /** 400 Bad Request - Validation Error */
+    @Getter
+    public static class BadRequest {
+        @Schema(example = "VE")
+        private final String code = null;
+        @Schema(example = "입력값이 잘못되었습니다.")
+        private final String message = null;
+
+        @Schema(description = "에러내용")
+        private final List<ValidationError> validationErrors = null;
+    }
+
     /** 401 Unauthorized */
     @Getter
     public static class Unauthorized {
