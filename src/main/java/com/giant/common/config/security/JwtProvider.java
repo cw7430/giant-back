@@ -37,13 +37,13 @@ public class JwtProvider {
     /**
      * AccessToken 생성
      */
-    public String generateAccessToken(long id, String accountRole) {
+    public String generateAccessToken(Long id, Long accountRoleId) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + accessTokenExpireTime);
 
         return Jwts.builder()
                 .subject(String.valueOf(id))
-                .claim("accountRole", accountRole)
+                .claim("accountRole", String.valueOf(accountRoleId))
                 .issuedAt(now)
                 .expiration(expiry)
                 .signWith(accessSecretKey, Jwts.SIG.HS256)
@@ -53,7 +53,7 @@ public class JwtProvider {
     /**
      * RefreshToken 생성
      */
-    public String generateRefreshToken(long id, boolean isAuto) {
+    public String generateRefreshToken(Long id, boolean isAuto) {
         Date now = new Date();
         long refreshTokenExpireTime = isAuto ? Duration.ofDays(365).toMillis() : this.refreshTokenExpireTime;
         Date expiry = new Date(now.getTime() + refreshTokenExpireTime);

@@ -84,7 +84,7 @@ public class JwtUtil {
     /**
      * RefreshToken 쿠키 제거
      */
-    public void removeRefreshTokenCookie(HttpServletResponse response) {
+    public void removeRefreshTokenFromCookie(HttpServletResponse response) {
         cookieUtil.removeCookie(response, "refreshToken", true);
     }
 
