@@ -1,6 +1,7 @@
 package com.giant.auth;
 
 import com.giant.auth.dto.SignInDto;
+import com.giant.auth.dto.request.CheckUserRequestDto;
 import com.giant.auth.dto.request.RefreshRequestDto;
 import com.giant.auth.dto.request.SignInRequestDto;
 import com.giant.auth.dto.response.SignInResponseDto;
@@ -60,5 +61,10 @@ public class AuthService {
         }
 
         return authUtil.createSignInResponse(refreshInfo, accessToken);
+    }
+
+    public void checkUserNameDuplicate(CheckUserRequestDto checkUserRequestDto) {
+        if (accountRepository.existsByUserName(checkUserRequestDto.userName()))
+            throw new CustomException(ResponseCode.DUPLICATE_RESOURCE);
     }
 }

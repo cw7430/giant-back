@@ -1,6 +1,7 @@
 package com.giant.auth;
 
 import com.giant.auth.doc.SignInSuccessResponseDoc;
+import com.giant.auth.dto.request.CheckUserRequestDto;
 import com.giant.auth.dto.request.RefreshRequestDto;
 import com.giant.auth.dto.request.SignInRequestDto;
 import com.giant.common.api.doc.error.ErrorResponseDoc;
@@ -69,6 +70,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
+    @Operation(summary = "토큰 재발급")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "토큰 재발급 성공", content = @Content(
                     schema = @Schema(implementation = SignInSuccessResponseDoc.class)
@@ -83,12 +85,29 @@ public class AuthController {
                     schema = @Schema(implementation = ErrorResponseDoc.InternalServerError.class)
             ))
     })
-    @Operation(summary = "토큰 재발급")
     public ResponseEntity<ResponseDto> refreshAccessToken(
             HttpServletRequest request,
             HttpServletResponse response,
             @RequestBody @Valid RefreshRequestDto refreshRequestDto
     ) {
         return ResponseEntity.ok(SuccessResponseDto.ok(authService.refreshAccessToken(request, response, refreshRequestDto)));
+    }
+
+    @PostMapping("/check-user")
+    @Operation(summary = "아이디 중복 체크")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "중복체크 성공", content = @Content(
+                    schema = @Schema(implementation = SuccessResponseDoc.class)
+            )),
+            @ApiResponse(responseCode = "409", description = "중복", content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDoc.DuplicateResource.class)
+            )),
+            @ApiResponse(responseCode = "500", description = "기타오류", content = @Content(
+                    schema = @Schema(implementation = ErrorResponseDoc.InternalServerError.class)
+            ))
+    })
+    public ResponseEntity<ResponseDto> checkUserNameDuplicate(@RequestBody @Valid CheckUserRequestDto checkUserRequestDto) {
+        authService.checkUserNameDuplicate(checkUserRequestDto);
+        return ResponseEntity.ok(SuccessResponseDto.ok());
     }
 }
