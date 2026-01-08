@@ -1,6 +1,7 @@
 package com.giant.common;
 
-import com.giant.common.api.response.ErrorResponseDto;
+import com.giant.common.api.doc.error.ErrorResponseDoc;
+import com.giant.common.api.doc.success.SuccessResponseDoc;
 import com.giant.common.api.response.ResponseDto;
 import com.giant.common.api.response.SuccessResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,10 +24,10 @@ public class HomeController {
     @Operation(summary = "헬스 체크")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(
-                    schema = @Schema(implementation = SuccessResponseDto.Simple.class)
+                    schema = @Schema(implementation = SuccessResponseDoc.class)
             )),
             @ApiResponse(responseCode = "500", description = "기타오류", content = @Content(
-                    schema = @Schema(implementation = ErrorResponseDto.Simple.class)
+                    schema = @Schema(implementation = ErrorResponseDoc.InternalServerError.class)
             ))
     })
     public ResponseEntity<ResponseDto> healthCheck() {
