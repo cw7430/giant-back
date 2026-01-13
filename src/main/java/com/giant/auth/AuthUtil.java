@@ -26,6 +26,7 @@ public class AuthUtil {
         String accessToken = jwtProvider.generateAccessToken(info.accountId(), info.accountRoleId());
         String refreshToken = jwtProvider.generateRefreshToken(info.accountId(), isAuto);
 
+        jwtUtil.addAccessTokenToCookie(response, accessToken);
         jwtUtil.addRefreshTokenToCookie(response, refreshToken, isAuto);
         return accessToken;
     }
@@ -33,7 +34,7 @@ public class AuthUtil {
     public SignInResponseDto createSignInResponse(SignInDto info, String accessToken) {
         Long expiresAt = jwtUtil.extractExpirationFromAccessToken(accessToken);
         return new SignInResponseDto(
-                accessToken, expiresAt, info.employeeCode(),
+                expiresAt, info.employeeCode(),
                 info.employeeName(), info.accountRoleName(),
                 info.employeeName(), info.departmentName(),
                 info.teamName(), info.positionName()
