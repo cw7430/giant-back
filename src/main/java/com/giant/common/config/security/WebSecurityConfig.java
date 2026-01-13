@@ -20,17 +20,17 @@ import java.util.List;
 
 @Configuration
 public class WebSecurityConfig {
-    private final JwtProvider jwtProvider;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final List<String> allowedOrigins;
 
-    public WebSecurityConfig(JwtProvider jwtProvider, @Value("${spring.profiles.active}") String activeProfile) {
-        this.jwtProvider = jwtProvider;
+    public WebSecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, @Value("${spring.profiles.active}") String activeProfile) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         if ("production".equals(activeProfile)) {
             allowedOrigins = List.of("https://www.erpgiant.com");
         } else if ("development".equals(activeProfile)) {
             allowedOrigins = List.of("https://www-test.erpgiant.com");
         } else {
-            allowedOrigins = List.of("http://localhost:5137","http://localhost:3000" );
+            allowedOrigins = List.of("http://localhost:5137", "http://localhost:3000");
         }
     }
 
@@ -53,7 +53,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(new JwtAuthenticationFilter(jwtProvider),
+                .addFilterBefore(jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class)
 
                 .build();
