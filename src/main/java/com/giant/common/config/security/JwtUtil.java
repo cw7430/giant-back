@@ -4,13 +4,11 @@ import com.giant.common.api.exception.CustomException;
 import com.giant.common.api.type.ResponseCode;
 import com.giant.common.util.CookieUtil;
 import io.jsonwebtoken.Claims;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 @Component
@@ -20,34 +18,24 @@ public class JwtUtil {
     private final CookieUtil cookieUtil;
 
     /**
-     * AccessToken 추출
+     * Token 추출
      */
-    private String extractAccessToken(HttpServletRequest request) {
+    public String extractBearerToken(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
-        if (header == null || !header.startsWith("Bearer ")) {
-            throw new CustomException(ResponseCode.UNAUTHORIZED);
-        }
+        if (header == null || !header.startsWith("Bearer ")) return null;
 
         return Optional.of(header)
                 .filter(h -> h.regionMatches(true, 0, "Bearer ", 0, 7))
                 .map(h -> h.substring(7).trim())
                 .filter(token -> !token.isEmpty())
-                .orElseThrow(() -> new CustomException(ResponseCode.UNAUTHORIZED));
+                .orElse(null);
     }
 
     /**
-     * RefreshToken 추출
+     * 추출 된 Token 검증
      */
-    private String extractRefreshToken(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null || cookies.length == 0) {
-            throw new CustomException(ResponseCode.UNAUTHORIZED);
-        }
-        return Arrays.stream(cookies)
-                .filter(c -> "refreshToken".equals(c.getName()))
-                .map(Cookie::getValue)
-                .filter(token -> !token.isBlank())
-                .findFirst()
+    private String validationExtractedToken(HttpServletRequest request) {
+        return Optional.of(extractBearerToken(request))
                 .orElseThrow(() -> new CustomException(ResponseCode.UNAUTHORIZED));
     }
 
@@ -60,6 +48,20 @@ public class JwtUtil {
             throw new CustomException(ResponseCode.UNAUTHORIZED);
         }
         return claims;
+    }
+
+    /**
+     * AccessToken 쿠키 등록
+     */
+    public void addAccessTokenToCookie(HttpServletResponse response, String accessToken) {
+        cookieUtil.addCookie(response, "accessToken", accessToken, -1, true);
+    }
+
+    /**
+     * AccessToken 쿠키 제거
+     */
+    public void removeAccessTokenFromCookie(HttpServletResponse response) {
+        cookieUtil.removeCookie(response, "accessToken", true);
     }
 
     /**
@@ -92,14 +94,14 @@ public class JwtUtil {
      * AccessToken 검증
      */
     public void validateAccessToken(HttpServletRequest request) {
-        getClaims(extractAccessToken(request), false);
+        getClaims(validationExtractedToken(request), false);
     }
 
     /**
      * AccessToken 에서 userId 추출
      */
     public long extractUserIdFromAccessToken(HttpServletRequest request) {
-        return Long.parseLong(getClaims(extractAccessToken(request), false).getId());
+        return Long.parseLong(getClaims(validationExtractedToken(request), false).getSubject());
     }
 
     /**
@@ -113,7 +115,7 @@ public class JwtUtil {
      * RefreshToken 에서 userId 추출
      */
     public long extractUserIdFromRefreshToken(HttpServletRequest request) {
-        return Long.parseLong(getClaims(extractRefreshToken(request), true).getId());
+        return Long.parseLong(getClaims(validationExtractedToken(request), true).getSubject());
     }
 
     /**
