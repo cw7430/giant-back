@@ -45,6 +45,7 @@ public class AuthService {
     }
 
     public void signOut(HttpServletResponse response) {
+        jwtUtil.removeAccessTokenFromCookie(response);
         jwtUtil.removeRefreshTokenFromCookie(response);
     }
 
