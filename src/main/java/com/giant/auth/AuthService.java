@@ -4,71 +4,101 @@ import com.giant.auth.dto.SignInDto;
 import com.giant.auth.dto.request.*;
 import com.giant.auth.dto.response.SignInResponseDto;
 import com.giant.auth.entity.Account;
+import com.giant.auth.entity.RefreshToken;
 import com.giant.auth.repository.AccountRepository;
+import com.giant.auth.repository.RefreshTokenRepository;
 import com.giant.common.api.exception.CustomException;
 import com.giant.common.api.type.ResponseCode;
 import com.giant.common.config.security.JwtProvider;
 import com.giant.common.config.security.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AuthService {
     private final AccountRepository accountRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
     private final JwtUtil jwtUtil;
     private final AuthUtil authUtil;
 
-    public SignInResponseDto signIn(HttpServletResponse response, SignInRequestDto signInRequestDto) {
-        SignInDto signInInfo = accountRepository.findSignInInfoByUserName(signInRequestDto.userName());
+    private SignInResponseDto issueTokensAndSaveRefreshToken(
+            SignInDto info,
+            boolean isAuto,
+            Account account
+    ) {
+        authUtil.validateAccountRole(info);
 
-        if (signInInfo == null || !passwordEncoder.matches(
-                signInRequestDto.password(), signInInfo.passwordHash()
-        )
-        ) throw new CustomException(ResponseCode.LOGIN_ERROR);
+        String accessToken =
+                jwtProvider.generateAccessToken(info.accountId(), info.accountRoleId());
 
-        authUtil.validateAccountRole(signInInfo);
+        String refreshToken =
+                jwtProvider.generateRefreshToken(info.accountId(), isAuto);
 
-        String accessToken = authUtil.generateAndSetTokens(response, signInInfo, signInRequestDto.isAuto());
+        Instant refreshTokenExpiresAt =
+                authUtil.extractRefreshTokenExpiresAt(refreshToken);
 
-        log.info("Sign In successfully for account ID: {}", signInInfo.accountId());
+        refreshTokenRepository.save(
+                RefreshToken.create(account, refreshToken, refreshTokenExpiresAt)
+        );
 
-        return authUtil.createSignInResponse(signInInfo, accessToken);
+        return authUtil.buildSignInResponse(
+                info, accessToken, refreshToken, isAuto
+        );
     }
 
-    public void signOut(HttpServletResponse response) {
-        jwtUtil.removeAccessTokenFromCookie(response);
-        jwtUtil.removeRefreshTokenFromCookie(response);
+    public SignInResponseDto signIn(SignInRequestDto signInRequestDto) {
+        SignInDto info = accountRepository.findSignInInfoByUserName(signInRequestDto.userName());
+        Account account = accountRepository.findById(info.accountId())
+                .orElseThrow(() -> new CustomException(ResponseCode.LOGIN_ERROR));
+
+        if (!passwordEncoder.matches(signInRequestDto.password(), info.passwordHash())) {
+            throw new CustomException(ResponseCode.LOGIN_ERROR);
+        }
+
+        log.info("Sign In successfully for account ID: {}", info.accountId());
+
+        return issueTokensAndSaveRefreshToken(info, signInRequestDto.isAuto(), account);
+    }
+
+    public void signOut(SignOutRequestDto signOutRequestDto) {
+        if (signOutRequestDto.refreshToken() == null || signOutRequestDto.refreshToken().isBlank()) return;
+        RefreshToken refreshToken = refreshTokenRepository
+                .findByToken(signOutRequestDto.refreshToken())
+                .orElse(null);
+        if (refreshToken != null) {
+            refreshTokenRepository.deleteByToken(refreshToken.getToken());
+            log.info("Sign Out successfully for account ID: {}", refreshToken.getAccount().getAccountId());
+        }
     }
 
     public SignInResponseDto refreshAccessToken(
             HttpServletRequest request,
-            HttpServletResponse response,
             RefreshRequestDto refreshRequestDto
     ) {
+        String prevRefreshToken = jwtUtil.validationExtractedToken(request);
         Long accountId = jwtUtil.extractUserIdFromRefreshToken(request);
-        SignInDto refreshInfo = accountRepository.findRefreshInfoByAccountId(accountId);
 
-        if (refreshInfo == null) throw new CustomException(ResponseCode.UNAUTHORIZED);
-        authUtil.validateAccountRole(refreshInfo);
+        SignInDto info = accountRepository.findRefreshInfoByAccountId(accountId);
+        Account account = accountRepository.findById(info.accountId())
+                .orElseThrow(() -> new CustomException(ResponseCode.UNAUTHORIZED));
 
-        String accessToken = jwtProvider.generateAccessToken(refreshInfo.accountId(), refreshInfo.accountRoleId());
-        if (refreshRequestDto.isAuto()) {
-            jwtUtil.addRefreshTokenToCookie(response, jwtProvider.generateRefreshToken(accountId, true), true);
-        }
+        refreshTokenRepository.deleteByToken(prevRefreshToken);
 
         log.info("Access token refreshed successfully for account ID: {}", accountId);
 
-        return authUtil.createSignInResponse(refreshInfo, accessToken);
+        return issueTokensAndSaveRefreshToken(info, refreshRequestDto.isAuto(), account);
     }
+
 
     public void checkUserNameDuplicate(CheckUserRequestDto checkUserRequestDto) {
         if (accountRepository.existsByUserName(checkUserRequestDto.userName()))
@@ -90,7 +120,7 @@ public class AuthService {
         Account account = accountRepository
                 .findById(accountId).orElseThrow(() -> new CustomException(ResponseCode.RESOURCE_NOT_FOUND));
 
-        if(!passwordEncoder.matches(
+        if (!passwordEncoder.matches(
                 updateAccountRequestDto.password(), account.getPasswordHash()
         )) throw new CustomException(ResponseCode.UNAUTHORIZED);
 
@@ -112,7 +142,7 @@ public class AuthService {
         Account account = accountRepository
                 .findById(accountId).orElseThrow(() -> new CustomException(ResponseCode.RESOURCE_NOT_FOUND));
 
-        if(!passwordEncoder.matches(
+        if (!passwordEncoder.matches(
                 updatePasswordRequestDto.prevPassword(), account.getPasswordHash()
         )) throw new CustomException(ResponseCode.UNAUTHORIZED);
 
