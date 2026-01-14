@@ -7,8 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.Clock;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Table(
@@ -75,25 +74,25 @@ public class EmployeeProfile {
             updatable = false,
             columnDefinition = "TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'UTC')"
     )
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @Column(
             name = "updated_at",
             nullable = false,
             columnDefinition = "TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'UTC')"
     )
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
     @Column(name = "left_at", columnDefinition = "TIMESTAMP(3) WITHOUT TIME ZONE")
-    private LocalDateTime leftAt = null;
+    private Instant leftAt = null;
 
     @PrePersist
     protected void onCreate() {
-        updatedAt = createdAt = LocalDateTime.now(Clock.systemUTC());
+        updatedAt = createdAt = Instant.now();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = LocalDateTime.now(Clock.systemUTC());
+        updatedAt = Instant.now();
     }
 }

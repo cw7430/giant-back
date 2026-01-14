@@ -7,7 +7,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import org.hibernate.annotations.Immutable;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
 @Immutable
@@ -61,11 +61,11 @@ public class EmployeeProfileView {
     private String updatedEmployeeName;
 
     @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
     @Column(name = "left_at")
-    private LocalDateTime leftAt;
+    private Instant leftAt;
 }

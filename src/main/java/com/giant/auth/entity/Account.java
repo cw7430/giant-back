@@ -7,8 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.Clock;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.List;
 
 @Entity
 @Table(
@@ -69,26 +69,29 @@ public class Account {
             updatable = false,
             columnDefinition = "TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'UTC')"
     )
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @Column(
             name = "updated_at",
             nullable = false,
             columnDefinition = "TIMESTAMP(3) WITHOUT TIME ZONE DEFAULT (NOW() AT TIME ZONE 'UTC')"
     )
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
     @OneToOne(mappedBy = "account")
     private EmployeeProfile employeeProfile;
 
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+    private List<RefreshToken> refreshTokens;
+
     @PrePersist
     protected void onCreate() {
-        updatedAt = createdAt = LocalDateTime.now(Clock.systemUTC());
+        updatedAt = createdAt = Instant.now();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = LocalDateTime.now(Clock.systemUTC());
+        updatedAt = Instant.now();
     }
 
     public static Account create(

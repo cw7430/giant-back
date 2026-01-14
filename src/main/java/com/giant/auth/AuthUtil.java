@@ -4,17 +4,19 @@ import com.giant.auth.dto.SignInDto;
 import com.giant.auth.dto.response.SignInResponseDto;
 import com.giant.common.api.exception.CustomException;
 import com.giant.common.api.type.ResponseCode;
-import com.giant.common.config.security.JwtProvider;
 import com.giant.common.config.security.JwtUtil;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.time.Instant;
 
 @Component
 @RequiredArgsConstructor
 public class AuthUtil {
-    private final JwtProvider jwtProvider;
+
     private final JwtUtil jwtUtil;
+
+    /* ---------- validation ---------- */
 
     public void validateAccountRole(SignInDto info) {
         if (info.accountRoleId() == 3L) {
@@ -22,22 +24,38 @@ public class AuthUtil {
         }
     }
 
-    public String generateAndSetTokens(HttpServletResponse response, SignInDto info, boolean isAuto) {
-        String accessToken = jwtProvider.generateAccessToken(info.accountId(), info.accountRoleId());
-        String refreshToken = jwtProvider.generateRefreshToken(info.accountId(), isAuto);
+    /* ---------- expiration ---------- */
 
-        jwtUtil.addAccessTokenToCookie(response, accessToken);
-        jwtUtil.addRefreshTokenToCookie(response, refreshToken, isAuto);
-        return accessToken;
+    public Instant extractRefreshTokenExpiresAt(String refreshToken) {
+        long expiresAtMillis = jwtUtil.extractExpirationFromRefreshToken(refreshToken);
+        return Instant.ofEpochMilli(expiresAtMillis);
     }
 
-    public SignInResponseDto createSignInResponse(SignInDto info, String accessToken) {
-        Long expiresAt = jwtUtil.extractExpirationFromAccessToken(accessToken);
+    public long extractAccessTokenExpiresAt(String accessToken) {
+        return jwtUtil.extractExpirationFromAccessToken(accessToken);
+    }
+
+    /* ---------- response builder ---------- */
+
+    public SignInResponseDto buildSignInResponse(
+            SignInDto info,
+            String accessToken,
+            String refreshToken,
+            boolean isAuto
+    ) {
         return new SignInResponseDto(
-                expiresAt, info.employeeCode(),
-                info.employeeName(), info.accountRoleName(),
-                info.employeeName(), info.departmentName(),
-                info.teamName(), info.positionName()
+                accessToken,
+                extractAccessTokenExpiresAt(accessToken),
+                refreshToken,
+                jwtUtil.extractExpirationFromRefreshToken(refreshToken),
+                isAuto,
+                info.employeeCode(),
+                info.employeeName(),
+                info.accountRoleName(),
+                info.employeeName(),
+                info.departmentName(),
+                info.teamName(),
+                info.positionName()
         );
     }
 }
