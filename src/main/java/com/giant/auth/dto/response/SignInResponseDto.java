@@ -1,7 +1,11 @@
 package com.giant.auth.dto.response;
 
 public record SignInResponseDto(
-        Long expiresAt,
+        String accessToken,
+        Long accessTokenExpiresAt,
+        String refreshToken,
+        Long refreshTokenExpiresAt,
+        boolean isAuto,
         String employeeCode,
         String employeeName,
         String accountRole,

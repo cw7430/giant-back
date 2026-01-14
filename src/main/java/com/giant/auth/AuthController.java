@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -42,11 +41,8 @@ public class AuthController {
                     schema = @Schema(implementation = ErrorResponseDoc.InternalServerError.class)
             ))
     })
-    public ResponseEntity<ResponseDto> signIn(
-            HttpServletResponse response,
-            @RequestBody @Valid SignInRequestDto signInRequestDto
-    ) {
-        return ResponseEntity.ok(SuccessResponseDto.ok(authService.signIn(response, signInRequestDto)));
+    public ResponseEntity<ResponseDto> signIn(@RequestBody @Valid SignInRequestDto signInRequestDto) {
+        return ResponseEntity.ok(SuccessResponseDto.ok(authService.signIn(signInRequestDto)));
     }
 
     @PostMapping("/sign-out")
@@ -59,8 +55,8 @@ public class AuthController {
                     schema = @Schema(implementation = ErrorResponseDoc.InternalServerError.class)
             ))
     })
-    public ResponseEntity<ResponseDto> signOut(HttpServletResponse response) {
-        authService.signOut(response);
+    public ResponseEntity<ResponseDto> signOut(@RequestBody SignOutRequestDto signOutRequestDto) {
+        authService.signOut(signOutRequestDto);
         return ResponseEntity.ok(SuccessResponseDto.ok());
     }
 
@@ -82,10 +78,9 @@ public class AuthController {
     })
     public ResponseEntity<ResponseDto> refreshAccessToken(
             HttpServletRequest request,
-            HttpServletResponse response,
             @RequestBody @Valid RefreshRequestDto refreshRequestDto
     ) {
-        return ResponseEntity.ok(SuccessResponseDto.ok(authService.refreshAccessToken(request, response, refreshRequestDto)));
+        return ResponseEntity.ok(SuccessResponseDto.ok(authService.refreshAccessToken(request, refreshRequestDto)));
     }
 
     @PostMapping("/check-user")
