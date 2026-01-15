@@ -56,6 +56,7 @@ public class AuthService {
         );
     }
 
+    @Transactional
     public SignInResponseDto signIn(SignInRequestDto signInRequestDto) {
         SignInDto info = accountRepository.findSignInInfoByUserName(signInRequestDto.userName());
         Account account = accountRepository.findById(info.accountId())
@@ -70,6 +71,7 @@ public class AuthService {
         return issueTokensAndSaveRefreshToken(info, signInRequestDto.isAuto(), account);
     }
 
+    @Transactional
     public void signOut(SignOutRequestDto signOutRequestDto) {
         if (signOutRequestDto.refreshToken() == null || signOutRequestDto.refreshToken().isBlank()) return;
         RefreshToken refreshToken = refreshTokenRepository
@@ -81,12 +83,13 @@ public class AuthService {
         }
     }
 
+    @Transactional
     public SignInResponseDto refreshAccessToken(
             HttpServletRequest request,
             RefreshRequestDto refreshRequestDto
     ) {
-        String prevRefreshToken = jwtUtil.validationExtractedToken(request);
-        Long accountId = jwtUtil.extractUserIdFromRefreshToken(request);
+        String prevRefreshToken = jwtUtil.extractToken(request);
+        Long accountId = jwtUtil.extractUserIdFromRefreshToken(prevRefreshToken);
 
         SignInDto info = accountRepository.findRefreshInfoByAccountId(accountId);
         Account account = accountRepository.findById(info.accountId())
@@ -112,7 +115,8 @@ public class AuthService {
             HttpServletRequest request,
             UpdateAccountRequestDto updateAccountRequestDto
     ) {
-        Long accountId = jwtUtil.extractUserIdFromAccessToken(request);
+        String token = jwtUtil.extractToken(request);
+        Long accountId = jwtUtil.extractUserIdFromAccessToken(token);
 
         if (accountRepository.existsByUserName(updateAccountRequestDto.userName()))
             throw new CustomException(ResponseCode.DUPLICATE_RESOURCE);
@@ -133,11 +137,13 @@ public class AuthService {
         log.info("Account information updated successfully. Updated account ID: {}", updatedAccount.getAccountId());
     }
 
+    @Transactional
     public void updatePassword(
             HttpServletRequest request,
             UpdatePasswordRequestDto updatePasswordRequestDto
     ) {
-        Long accountId = jwtUtil.extractUserIdFromAccessToken(request);
+        String token = jwtUtil.extractToken(request);
+        Long accountId = jwtUtil.extractUserIdFromAccessToken(token);
 
         Account account = accountRepository
                 .findById(accountId).orElseThrow(() -> new CustomException(ResponseCode.RESOURCE_NOT_FOUND));
