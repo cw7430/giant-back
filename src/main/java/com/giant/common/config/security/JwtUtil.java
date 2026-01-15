@@ -15,9 +15,9 @@ public class JwtUtil {
     private final JwtProvider jwtProvider;
 
     /**
-     * Token 추출
+     * 필터를 위한 Token 추출
      */
-    public String extractBearerToken(HttpServletRequest request) {
+    public String extractTokenForFilter(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
         if (header == null || !header.startsWith("Bearer ")) return null;
 
@@ -29,10 +29,10 @@ public class JwtUtil {
     }
 
     /**
-     * 추출 된 Token 검증
+     * Token 추출
      */
-    public String validationExtractedToken(HttpServletRequest request) {
-        return Optional.of(extractBearerToken(request))
+    public String extractToken(HttpServletRequest request) {
+        return Optional.of(extractTokenForFilter(request))
                 .orElseThrow(() -> new CustomException(ResponseCode.UNAUTHORIZED));
     }
 
@@ -50,15 +50,15 @@ public class JwtUtil {
     /**
      * AccessToken 검증
      */
-    public void validateAccessToken(HttpServletRequest request) {
-        getClaims(validationExtractedToken(request), false);
+    public void validateAccessToken(String token) {
+        getClaims(token, false);
     }
 
     /**
      * AccessToken 에서 userId 추출
      */
-    public long extractUserIdFromAccessToken(HttpServletRequest request) {
-        return Long.parseLong(getClaims(validationExtractedToken(request), false).getSubject());
+    public long extractUserIdFromAccessToken(String token) {
+        return Long.parseLong(getClaims(token, false).getSubject());
     }
 
     /**
@@ -71,8 +71,8 @@ public class JwtUtil {
     /**
      * RefreshToken 에서 userId 추출
      */
-    public long extractUserIdFromRefreshToken(HttpServletRequest request) {
-        return Long.parseLong(getClaims(validationExtractedToken(request), true).getSubject());
+    public long extractUserIdFromRefreshToken(String token) {
+        return Long.parseLong(getClaims(token, true).getSubject());
     }
 
     /**
