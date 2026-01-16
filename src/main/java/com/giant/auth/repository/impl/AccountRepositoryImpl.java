@@ -11,6 +11,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class AccountRepositoryImpl implements AccountRepositoryCustom {
@@ -52,12 +54,12 @@ public class AccountRepositoryImpl implements AccountRepositoryCustom {
     }
 
     @Override
-    public SignInDto findSignInInfoByUserName(String userName) {
-       return findSignInInfo(QAccount.account.userName.eq(userName));
+    public Optional<SignInDto> findSignInInfoByUserName(String userName) {
+        return Optional.ofNullable(findSignInInfo(QAccount.account.userName.eq(userName)));
     }
 
     @Override
-    public SignInDto findRefreshInfoByAccountId(Long accountId) {
-        return findSignInInfo(QAccount.account.accountId.eq(accountId));
+    public Optional<SignInDto> findRefreshInfoByAccountId(Long accountId) {
+        return Optional.ofNullable(findSignInInfo(QAccount.account.accountId.eq(accountId)));
     }
 }
