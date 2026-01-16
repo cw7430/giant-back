@@ -58,7 +58,8 @@ public class AuthService {
 
     @Transactional
     public SignInResponseDto signIn(SignInRequestDto signInRequestDto) {
-        SignInDto info = accountRepository.findSignInInfoByUserName(signInRequestDto.userName());
+        SignInDto info = accountRepository.findSignInInfoByUserName(signInRequestDto.userName())
+                .orElseThrow(() -> new CustomException(ResponseCode.LOGIN_ERROR));
         Account account = accountRepository.findById(info.accountId())
                 .orElseThrow(() -> new CustomException(ResponseCode.LOGIN_ERROR));
 
@@ -91,7 +92,8 @@ public class AuthService {
         String prevRefreshToken = jwtUtil.extractToken(request);
         Long accountId = jwtUtil.extractUserIdFromRefreshToken(prevRefreshToken);
 
-        SignInDto info = accountRepository.findRefreshInfoByAccountId(accountId);
+        SignInDto info = accountRepository.findRefreshInfoByAccountId(accountId)
+                .orElseThrow(() -> new CustomException(ResponseCode.UNAUTHORIZED));
         Account account = accountRepository.findById(info.accountId())
                 .orElseThrow(() -> new CustomException(ResponseCode.UNAUTHORIZED));
 
