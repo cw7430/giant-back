@@ -104,7 +104,7 @@ public class AuthController {
         return ResponseEntity.ok(SuccessResponseDto.ok());
     }
 
-    @PutMapping("/account")
+    @PatchMapping("/account")
     @Operation(summary = "계정 정보 수정")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "수정 성공", content = @Content(
@@ -134,7 +134,7 @@ public class AuthController {
         return ResponseEntity.ok(SuccessResponseDto.ok());
     }
 
-    @PutMapping("/password")
+    @PatchMapping("/password")
     @Operation(summary = "비밀번호 수정")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "수정 성공", content = @Content(
