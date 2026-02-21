@@ -9,44 +9,47 @@ import java.time.Instant
 @Table(
     name = "profile",
     schema = "employee",
-    indexes = [Index(name = "ix_profile_team", columnList = "team_id"), Index(
-        name = "ix_profile_position",
-        columnList = "position_id"
-    )]
+    indexes = [
+        Index(name = "ix_profile_team", columnList = "team_id"),
+        Index(name = "ix_profile_position", columnList = "position_id")
+    ]
 )
 class EmployeeProfile(
-    @Id
-    @Column(name = "id")
-    val employeeId: Long? = null,
-
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id", nullable = false, foreignKey = ForeignKey(name = "fk_profile_account"))
-    var account: Account? = null,
+    var account: Account,
 
     @Column(name = "employee_code", nullable = false, unique = true)
-    var employeeCode: String? = null,
+    var employeeCode: String,
 
     @Column(name = "employee_name", nullable = false)
-    var employeeName: String? = null,
+    var employeeName: String,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id", nullable = false, foreignKey = ForeignKey(name = "fk_profile_team"))
-    var team: Team? = null,
+    var team: Team,
 
     @Column(name = "employee_role", nullable = false, columnDefinition = "employee.employee_role")
     @Enumerated(EnumType.STRING)
-    var employeeRole: EmployeeRole? = null,
+    var employeeRole: EmployeeRole,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "position_id", nullable = false, foreignKey = ForeignKey(name = "fk_profile_position"))
-    var position: Position? = null,
+    var position: Position,
 
     @Column(name = "created_by", nullable = false, updatable = false)
-    var createdBy: Long? = null,
+    var createdBy: Long,
 
     @Column(name = "updated_by")
     var updatedBy: Long? = null,
+
+    @Column(name = "left_at", columnDefinition = "TIMESTAMP(6) WITH TIME ZONE")
+    var leftAt: Instant? = null
+) {
+    @Id
+    @Column(name = "id")
+    val employeeId: Long? = null
 
     @Column(
         name = "created_at",
@@ -54,18 +57,15 @@ class EmployeeProfile(
         updatable = false,
         columnDefinition = "TIMESTAMP(6) WITH TIME ZONE DEFAULT (NOW() AT TIME ZONE 'UTC')"
     )
-    var createdAt: Instant? = null,
+    var createdAt: Instant? = Instant.now()
 
     @Column(
         name = "updated_at",
         nullable = false,
         columnDefinition = "TIMESTAMP(6) WITH TIME ZONE DEFAULT (NOW() AT TIME ZONE 'UTC')"
     )
-    var updatedAt: Instant? = null,
+    var updatedAt: Instant? = Instant.now()
 
-    @Column(name = "left_at", columnDefinition = "TIMESTAMP(6) WITH TIME ZONE")
-    var leftAt: Instant? = null
-) {
     @PrePersist
     fun onCreate() {
         val now = Instant.now()
@@ -77,18 +77,18 @@ class EmployeeProfile(
     fun onUpdate() {
         updatedAt = Instant.now()
     }
-
-    /*constraint ck_employee_left_state
-        check (((employee_role <> 'LEFT'::employee.employee_role) AND (left_at IS NULL)) OR
-                ((employee_role = 'LEFT'::employee.employee_role) AND (left_at IS NOT NULL)))*/
-    /*
-        create index ix_active_employee_created_at
-        on employee.profile (created_at desc)
-        where (employee_role <> 'LEFT'::employee.employee_role);
-        */
-    /*
-        create index ix_left_employee_left_at
-        on employee.profile (left_at desc)
-        where (employee_role = 'LEFT'::employee.employee_role);
-        */
 }
+
+/*constraint ck_employee_left_state
+       check (((employee_role <> 'LEFT'::employee.employee_role) AND (left_at IS NULL)) OR
+               ((employee_role = 'LEFT'::employee.employee_role) AND (left_at IS NOT NULL)))*/
+/*
+    create index ix_active_employee_created_at
+    on employee.profile (created_at desc)
+    where (employee_role <> 'LEFT'::employee.employee_role);
+    */
+/*
+    create index ix_left_employee_left_at
+    on employee.profile (left_at desc)
+    where (employee_role = 'LEFT'::employee.employee_role);
+    */

@@ -7,16 +7,18 @@ import jakarta.persistence.*
 class Team(
     @Id
     @Column(name = "id", nullable = false)
-    val teamId: Long? = null,
+    var teamId: Long,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id", nullable = false, foreignKey = ForeignKey(name = "fk_team_department"))
-    var department: Department? = null,
+    var department: Department,
 
     @Column(name = "team_name", nullable = false, unique = true)
-    var teamName: String? = null,
-
-    @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
-    var employeeProfiles: MutableList<EmployeeProfile> = mutableListOf()
+    var teamName: String,
 ) {
+    @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
+    private var _employeeProfiles: MutableList<EmployeeProfile> = mutableListOf()
+
+    val employeeProfiles: List<EmployeeProfile>
+        get() = _employeeProfiles.toList()
 }

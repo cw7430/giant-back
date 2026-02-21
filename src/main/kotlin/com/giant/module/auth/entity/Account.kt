@@ -8,26 +8,30 @@ import java.time.Instant
 @Entity
 @Table(name = "account", schema = "auth")
 class Account(
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, updatable = false)
-    val accountId: Long? = null,
-
     @Column(name = "user_name", nullable = false, length = 25)
-    var userName: String? = null,
+    var userName: String,
 
     @Column(name = "password_hash", nullable = false)
-    var passwordHash: String? = null,
+    var passwordHash: String,
 
     @Column(name = "phone_number", nullable = false, length = 15)
-    var phoneNumber: String? = null,
+    var phoneNumber: String,
 
     @Column(name = "email", nullable = false)
-    var email: String? = null,
+    var email: String,
 
     @Column(name = "auth_role", nullable = false, columnDefinition = "auth.auth_role DEFAULT 'USER'::auth.auth_role")
     @Enumerated(EnumType.STRING)
     var authRole: AuthRole = AuthRole.USER,
+
+    @Column(name = "deleted_at", columnDefinition = "TIMESTAMP(6) WITH TIME ZONE")
+    var deletedAt: Instant? = null,
+
+) {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, updatable = false)
+    val accountId: Long? = null
 
     @Column(
         name = "created_at",
@@ -35,24 +39,25 @@ class Account(
         updatable = false,
         columnDefinition = "TIMESTAMP(6) WITH TIME ZONE DEFAULT (NOW() AT TIME ZONE 'UTC')"
     )
-    var createdAt: Instant? = null,
+    var createdAt: Instant = Instant.now()
 
     @Column(
         name = "updated_at",
         nullable = false,
         columnDefinition = "TIMESTAMP(6) WITH TIME ZONE DEFAULT (NOW() AT TIME ZONE 'UTC')"
     )
-    var updatedAt: Instant? = null,
+    var updatedAt: Instant = Instant.now()
 
-    @Column(name = "deleted_at", columnDefinition = "TIMESTAMP(6) WITH TIME ZONE")
-    var deletedAt: Instant? = null,
+    @OneToOne(mappedBy = "account", cascade = [CascadeType.ALL])
+    var employeeProfile: EmployeeProfile? = null
+        protected set
 
-    @OneToOne(mappedBy = "account")
-    var employeeProfile: EmployeeProfile? = null,
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    private val _refreshTokens: MutableList<RefreshToken> = mutableListOf()
 
-    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
-    var refreshTokens: MutableList<RefreshToken> = mutableListOf()
-) {
+    val refreshTokens: List<RefreshToken>
+        get() = _refreshTokens.toList()
+
     @PrePersist
     fun onCreate() {
         val now = Instant.now()
@@ -63,6 +68,22 @@ class Account(
     @PreUpdate
     fun onUpdate() {
         updatedAt = Instant.now()
+    }
+
+    fun withdraw() {
+        this.authRole = AuthRole.LEFT
+        this.deletedAt = Instant.now()
+    }
+
+    companion object {
+        fun create(
+            userName: String,
+            passwordHash: String,
+            phoneNumber: String,
+            email: String
+        ): Account {
+            return Account(userName, passwordHash, phoneNumber, email)
+        }
     }
 }
 

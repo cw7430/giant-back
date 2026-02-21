@@ -35,7 +35,6 @@ class AuthService(
         info: SignInVo,
         isAuto: Boolean,
         account: Account,
-        refreshTable: RefreshToken? = null
     ): SignInResponseDto {
         authUtil.validateAuthRole(info)
 
@@ -51,25 +50,19 @@ class AuthService(
         val refreshTokenExpiresAtMs = refreshClaims.expiresAtMs
         val refreshTokenExpiresAtDate = Instant.ofEpochMilli(refreshTokenExpiresAtMs)
 
-        upsertRefreshTable(account, refreshClaims.token, expiresAt = refreshTokenExpiresAtDate, refreshTable)
+        refreshTokenRepository.save(
+            RefreshToken.create(
+                account,
+                token = refreshClaims.token,
+                expiresAt = refreshTokenExpiresAtDate
+            )
+        )
 
         return authUtil.buildSignInResponse(
             info, accessToken = accessClaims.token, accessTokenExpiresAtMs = accessClaims.expiresAtMs,
             refreshToken = refreshClaims.token, isAuto,
             refreshTokenExpiresAtMs
         )
-    }
-
-    fun upsertRefreshTable(
-        account: Account,
-        token: String,
-        expiresAt: Instant,
-        refreshTable: RefreshToken? = null
-    ) {
-        val entity = refreshTable
-            ?.update(account, token, expiresAt)
-            ?: RefreshToken.create(account, token, expiresAt)
-        refreshTokenRepository.save(entity)
     }
 
     @Transactional
@@ -85,7 +78,11 @@ class AuthService(
 
         log.info { "Sign In successfully for account ID: $info.accountId" }
 
-        return issueTokensAndBuild(info, requestDto.isAuto, account)
+        return issueTokensAndBuild(
+            info = info,
+            isAuto = requestDto.isAuto,
+            account = account
+        )
     }
 
     @Transactional
@@ -97,11 +94,16 @@ class AuthService(
             ?: throw CustomException(ResponseCode.UNAUTHORIZED)
         val info = accountRepository.findRefreshInfoByAccountId(accountId)
             ?: throw CustomException(ResponseCode.UNAUTHORIZED)
+        refreshTokenRepository.delete(refreshTable)
         val account = accountRepository.findByIdOrNull(info.accountId)
             ?: throw CustomException(ResponseCode.UNAUTHORIZED)
 
         log.info { "Refresh successfully for account ID: $info.accountId" }
 
-        return issueTokensAndBuild(info, requestDto.isAuto, account, refreshTable)
+        return issueTokensAndBuild(
+            info = info,
+            isAuto = requestDto.isAuto,
+            account = account
+        )
     }
 }

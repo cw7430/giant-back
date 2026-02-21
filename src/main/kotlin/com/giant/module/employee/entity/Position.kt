@@ -7,18 +7,20 @@ import jakarta.persistence.*
 class Position(
     @Id
     @Column(name = "id", nullable = false)
-    val positionId: Long? = null,
+    var positionId: Long,
 
     @Column(name = "position_name", nullable = false, unique = true)
-    var positionName: String? = null,
+    var positionName: String,
 
     @Column(name = "basic_salary", nullable = false)
-    var basicSalary: Long? = null,
+    var basicSalary: Long,
 
     @Column(name = "incentive_salary", nullable = false)
-    var incentiveSalary: Long? = null,
-
-    @OneToMany(mappedBy = "position", fetch = FetchType.LAZY)
-    var employeeProfiles: MutableList<EmployeeProfile> = mutableListOf()
+    var incentiveSalary: Long,
 ) {
+    @OneToMany(mappedBy = "position", fetch = FetchType.LAZY)
+    private val _employeeProfiles: MutableList<EmployeeProfile> = mutableListOf()
+
+    val employeeProfiles: List<EmployeeProfile>
+        get() = _employeeProfiles.toList()
 }
