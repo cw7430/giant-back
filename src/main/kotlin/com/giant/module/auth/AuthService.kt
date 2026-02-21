@@ -4,13 +4,15 @@ import com.giant.common.api.exception.CustomException
 import com.giant.common.api.type.ResponseCode
 import com.giant.common.config.security.JwtProvider
 import com.giant.common.config.security.JwtUtil
+import com.giant.module.auth.dto.request.RefreshRequestDto
 import com.giant.module.auth.dto.request.SignInRequestDto
 import com.giant.module.auth.dto.response.SignInResponseDto
-import com.giant.module.auth.vo.SignInVo
+import com.giant.module.auth.dto.vo.SignInVo
 import com.giant.module.auth.entity.Account
 import com.giant.module.auth.entity.RefreshToken
 import com.giant.module.auth.repository.AccountRepository
 import com.giant.module.auth.repository.RefreshTokenRepository
+import jakarta.servlet.http.HttpServletRequest
 import mu.KotlinLogging
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -29,7 +31,12 @@ class AuthService(
 ) {
     private val log = KotlinLogging.logger {}
 
-    private fun issueTokensAndSaveRefreshToken(info: SignInVo, isAuto: Boolean, account: Account): SignInResponseDto {
+    private fun issueTokensAndBuild(
+        info: SignInVo,
+        isAuto: Boolean,
+        account: Account,
+        refreshTable: RefreshToken? = null
+    ): SignInResponseDto {
         authUtil.validateAuthRole(info)
 
         val accessClaims = jwtProvider.generateAccessToken(
@@ -44,9 +51,7 @@ class AuthService(
         val refreshTokenExpiresAtMs = refreshClaims.expiresAtMs
         val refreshTokenExpiresAtDate = Instant.ofEpochMilli(refreshTokenExpiresAtMs)
 
-        refreshTokenRepository.save(
-            RefreshToken.create(account, refreshClaims.token, refreshTokenExpiresAtDate)
-        )
+        upsertRefreshTable(account, refreshClaims.token, expiresAt = refreshTokenExpiresAtDate, refreshTable)
 
         return authUtil.buildSignInResponse(
             info, accessToken = accessClaims.token, accessTokenExpiresAtMs = accessClaims.expiresAtMs,
@@ -55,10 +60,22 @@ class AuthService(
         )
     }
 
+    fun upsertRefreshTable(
+        account: Account,
+        token: String,
+        expiresAt: Instant,
+        refreshTable: RefreshToken? = null
+    ) {
+        val entity = refreshTable
+            ?.update(account, token, expiresAt)
+            ?: RefreshToken.create(account, token, expiresAt)
+        refreshTokenRepository.save(entity)
+    }
+
     @Transactional
     fun signIn(requestDto: SignInRequestDto): SignInResponseDto {
         val info = accountRepository.findSignInInfoByUserName(requestDto.userName)
-            .orElseThrow { CustomException(ResponseCode.LOGIN_ERROR) }
+            ?: throw CustomException(ResponseCode.LOGIN_ERROR)
         val account = accountRepository.findByIdOrNull(info.accountId)
             ?: throw CustomException(ResponseCode.LOGIN_ERROR)
 
@@ -68,6 +85,23 @@ class AuthService(
 
         log.info { "Sign In successfully for account ID: $info.accountId" }
 
-        return issueTokensAndSaveRefreshToken(info, requestDto.isAuto, account)
+        return issueTokensAndBuild(info, requestDto.isAuto, account)
+    }
+
+    @Transactional
+    fun refresh(request: HttpServletRequest, requestDto: RefreshRequestDto): SignInResponseDto {
+        val prevRefreshToken = jwtUtil.extractToken(request)
+        val accountId = jwtUtil.extractUserIdFromRefreshToken(prevRefreshToken)
+
+        val refreshTable = refreshTokenRepository.findByToken(prevRefreshToken)
+            ?: throw CustomException(ResponseCode.UNAUTHORIZED)
+        val info = accountRepository.findRefreshInfoByAccountId(accountId)
+            ?: throw CustomException(ResponseCode.UNAUTHORIZED)
+        val account = accountRepository.findByIdOrNull(info.accountId)
+            ?: throw CustomException(ResponseCode.UNAUTHORIZED)
+
+        log.info { "Refresh successfully for account ID: $info.accountId" }
+
+        return issueTokensAndBuild(info, requestDto.isAuto, account, refreshTable)
     }
 }

@@ -4,7 +4,7 @@ import com.giant.common.api.exception.CustomException
 import com.giant.common.api.type.ResponseCode
 import com.giant.module.auth.dto.response.SignInResponseDto
 import com.giant.module.auth.entity.type.AuthRole
-import com.giant.module.auth.vo.SignInVo
+import com.giant.module.auth.dto.vo.SignInVo
 import org.springframework.stereotype.Component
 
 @Component
