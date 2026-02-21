@@ -1,10 +1,10 @@
 plugins {
-	id("java")
 	kotlin("jvm") version "2.2.21"
 	kotlin("plugin.spring") version "2.2.21"
 	id("org.springframework.boot") version "4.0.2"
 	id("io.spring.dependency-management") version "1.1.7"
 	kotlin("plugin.jpa") version "2.2.21"
+	id("com.google.devtools.ksp") version "2.3.4"
 }
 
 group = "com"
@@ -42,12 +42,9 @@ dependencies {
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")
 
-	compileOnly("org.projectlombok:lombok")
-    annotationProcessor("org.projectlombok:lombok")
-
 	runtimeOnly("org.postgresql:postgresql")
 	implementation("io.github.openfeign.querydsl:querydsl-jpa:7.1")
-	annotationProcessor("io.github.openfeign.querydsl:querydsl-apt:7.1:jakarta")
+	ksp("io.github.openfeign.querydsl:querydsl-ksp-codegen:7.1")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-security-test")
