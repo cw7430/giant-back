@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: giant
+  datasource:
+    driver-class-name: org.postgresql.Driver
+  jackson:
+    time-zone: UTC
+  profiles:
+    active: local
+
+server:
+  port: 8080
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html # 👉 OpenAPI JSON 문서 경로 (기본: /api-docs)
+  api-docs:
+    path: /api-docs  # 👉 Swagger UI 접속 경로 (기본: /swagger-ui/index.html)
