@@ -46,6 +46,9 @@ dependencies {
 	implementation("io.github.openfeign.querydsl:querydsl-jpa:7.1")
 	ksp("io.github.openfeign.querydsl:querydsl-ksp-codegen:7.1")
 
+	implementation("org.flywaydb:flyway-core")
+	implementation("org.flywaydb:flyway-database-postgresql")
+
 	testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-security-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-validation-test")
