@@ -10,7 +10,7 @@ data class SignInVo(
     val employeeCode: String,
     val employeeName: String,
     val employeeRole: EmployeeRole,
-    val departmentName: String,
-    val teamName: String,
-    val positionName: String
+    val departmentCode: String,
+    val teamCode: String,
+    val positionCode: String
 )

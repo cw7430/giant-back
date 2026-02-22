@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 class AuthUtil {
     fun validateAuthRole(info: SignInVo) {
         if (info.authRole == AuthRole.LEFT) {
-            throw CustomException(ResponseCode.FORBIDDEN);
+            throw CustomException(ResponseCode.FORBIDDEN)
         }
     }
 
@@ -26,8 +26,8 @@ class AuthUtil {
         return SignInResponseDto(
             accessToken, accessTokenExpiresAtMs, refreshToken, refreshTokenExpiresAtMs,
             isAuto, info.employeeCode, info.employeeName, info.authRole,
-            info.employeeRole, department = info.departmentName,
-            team = info.teamName, position = info.positionName
+            info.employeeRole, department = info.departmentCode,
+            team = info.teamCode, position = info.positionCode
         )
     }
 }

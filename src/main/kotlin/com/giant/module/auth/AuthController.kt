@@ -1,11 +1,13 @@
 package com.giant.module.auth
 
 import com.giant.common.api.doc.error.ErrorResponseDoc
+import com.giant.common.api.doc.success.SuccessResponseDoc
 import com.giant.common.api.response.ResponseDto
 import com.giant.common.api.response.SuccessResponseDto
 import com.giant.module.auth.doc.SignInSuccessResponseDoc
 import com.giant.module.auth.dto.request.RefreshRequestDto
 import com.giant.module.auth.dto.request.SignInRequestDto
+import com.giant.module.auth.dto.request.SignOutRequestDto
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
@@ -62,9 +64,8 @@ class AuthController(
             ]
         )
     )
-    fun signIn(@RequestBody @Valid requestDto: SignInRequestDto): ResponseEntity<ResponseDto> {
-        return ResponseEntity.ok(SuccessResponseDto.WithResult(authService.signIn(requestDto)))
-    }
+    fun signIn(@RequestBody @Valid requestDto: SignInRequestDto): ResponseEntity<ResponseDto> =
+        ResponseEntity.ok(SuccessResponseDto.WithResult(authService.signIn(requestDto)))
 
     @PostMapping("/refresh")
     @Operation(summary = "토큰 재발급")
@@ -94,7 +95,30 @@ class AuthController(
             ]
         )
     )
-    fun refresh(request: HttpServletRequest, @RequestBody requestDto: RefreshRequestDto): ResponseEntity<ResponseDto> {
-        return ResponseEntity.ok(SuccessResponseDto.WithResult(authService.refresh(request, requestDto)))
+    fun refresh(request: HttpServletRequest, @RequestBody requestDto: RefreshRequestDto): ResponseEntity<ResponseDto> =
+        ResponseEntity.ok(SuccessResponseDto.WithResult(authService.refresh(request, requestDto)))
+
+    @PostMapping("/sign-out")
+    @Operation(summary = "로그아웃")
+    @ApiResponses(
+        ApiResponse(
+            responseCode = "200", description = "로그아웃 성공", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = SuccessResponseDoc::class)
+                )
+            ]
+        ),
+        ApiResponse(
+            responseCode = "500", description = "기타오류", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDoc.InternalServerError::class)
+                )
+            ]
+        )
+    )
+    fun signOut(@RequestBody requestDto: SignOutRequestDto) {
+        authService.signOut(requestDto)
     }
 }

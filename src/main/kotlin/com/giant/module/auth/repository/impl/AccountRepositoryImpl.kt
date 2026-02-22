@@ -32,9 +32,9 @@ class AccountRepositoryImpl(
                     employeeProfile.employeeCode,
                     employeeProfile.employeeName,
                     employeeProfile.employeeRole,
-                    department.departmentName,
-                    team.teamName,
-                    position.positionName
+                    department.departmentCode,
+                    team.teamCode,
+                    position.positionCode
                 )
             )
             .from(account)
