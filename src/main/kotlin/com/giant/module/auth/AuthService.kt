@@ -6,6 +6,7 @@ import com.giant.common.config.security.JwtProvider
 import com.giant.common.config.security.JwtUtil
 import com.giant.module.auth.dto.request.RefreshRequestDto
 import com.giant.module.auth.dto.request.SignInRequestDto
+import com.giant.module.auth.dto.request.SignOutRequestDto
 import com.giant.module.auth.dto.response.SignInResponseDto
 import com.giant.module.auth.dto.vo.SignInVo
 import com.giant.module.auth.entity.Account
@@ -105,5 +106,14 @@ class AuthService(
             isAuto = requestDto.isAuto,
             account = account
         )
+    }
+
+    @Transactional
+    fun signOut(requestDto: SignOutRequestDto) {
+        if (requestDto.refreshToken == null) return
+        val refreshTable = refreshTokenRepository.findByToken(requestDto.refreshToken) ?: return
+        refreshTokenRepository.delete(refreshTable)
+
+        log.info { "Sign Out successfully for account ID: ${refreshTable.account.accountId}" }
     }
 }
