@@ -7,7 +7,10 @@ import java.time.Instant
 @Table(
     name = "refresh_token",
     schema = "auth",
-    indexes = [Index(name = "ix_token_account", columnList = "account_id")]
+    indexes = [
+        Index(name = "ix_token_account", columnList = "account_id"),
+        Index(name = "ix_token_expires_at", columnList = "expires_at"),
+    ]
 )
 class RefreshToken(
     @ManyToOne(fetch = FetchType.LAZY)
@@ -17,14 +20,15 @@ class RefreshToken(
     @Column(name = "token", nullable = false, unique = true)
     var token: String,
 
-    @Column(name = "expires_at", nullable = false, columnDefinition = "TIMESTAMP(6) WITH TIME ZONE")
+    @Column(name = "expires_at", nullable = false)
     var expiresAt: Instant
 ) {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false)
-    val refreshTokenId: Long? = null
+    var refreshTokenId: Long? = null
+        protected set
 
     companion object {
         fun create(account: Account, token: String, expiresAt: Instant): RefreshToken {

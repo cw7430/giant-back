@@ -11,7 +11,9 @@ import java.time.Instant
     schema = "employee",
     indexes = [
         Index(name = "ix_profile_team", columnList = "team_id"),
-        Index(name = "ix_profile_position", columnList = "position_id")
+        Index(name = "ix_profile_position", columnList = "position_id"),
+        Index(name = "ix_profile_created_by", columnList = "created_by"),
+        Index(name = "ix_profile_updated_by", columnList = "updated_by"),
     ]
 )
 class EmployeeProfile(
@@ -41,28 +43,27 @@ class EmployeeProfile(
     @Column(name = "created_by", nullable = false, updatable = false)
     var createdBy: Long,
 
-    @Column(name = "updated_by")
-    var updatedBy: Long? = null,
+    @Column(name = "updated_by", nullable = false)
+    var updatedBy: Long,
 
-    @Column(name = "left_at", columnDefinition = "TIMESTAMP(6) WITH TIME ZONE")
+    @Column(name = "left_at")
     var leftAt: Instant? = null
 ) {
     @Id
     @Column(name = "id")
-    val employeeId: Long? = null
+    var employeeId: Long? = null
+        protected set
 
     @Column(
         name = "created_at",
         nullable = false,
-        updatable = false,
-        columnDefinition = "TIMESTAMP(6) WITH TIME ZONE DEFAULT (NOW() AT TIME ZONE 'UTC')"
+        updatable = false
     )
     var createdAt: Instant? = Instant.now()
 
     @Column(
         name = "updated_at",
-        nullable = false,
-        columnDefinition = "TIMESTAMP(6) WITH TIME ZONE DEFAULT (NOW() AT TIME ZONE 'UTC')"
+        nullable = false
     )
     var updatedAt: Instant? = Instant.now()
 
@@ -76,6 +77,30 @@ class EmployeeProfile(
     @PreUpdate
     fun onUpdate() {
         updatedAt = Instant.now()
+    }
+
+    companion object {
+        fun create(
+            account: Account,
+            employeeCode: String,
+            employeeName: String,
+            team: Team,
+            employeeRole: EmployeeRole,
+            position: Position,
+            createdBy: Long,
+            updatedBy: Long
+        ): EmployeeProfile {
+            return EmployeeProfile(
+                account,
+                employeeCode,
+                employeeName,
+                team,
+                employeeRole,
+                position,
+                createdBy,
+                updatedBy
+            )
+        }
     }
 }
 

@@ -14,5 +14,16 @@ class EmployeeSerial(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false)
-    val serialId: Long? = null
+    var serialId: Long? = null
+        protected set
+
+    fun increaseSerialValue(table: EmployeeSerial) {
+        this.serialValue = table.serialValue + 1
+    }
+
+    companion object {
+        fun create(serialName: String, serialValue: Long): EmployeeSerial {
+            return EmployeeSerial(serialName, serialValue)
+        }
+    }
 }
