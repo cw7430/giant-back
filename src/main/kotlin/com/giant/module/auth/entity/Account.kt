@@ -20,31 +20,30 @@ class Account(
     @Column(name = "email", nullable = false)
     var email: String,
 
-    @Column(name = "auth_role", nullable = false, columnDefinition = "auth.auth_role DEFAULT 'USER'::auth.auth_role")
+    @Column(name = "auth_role", nullable = false)
     @Enumerated(EnumType.STRING)
     var authRole: AuthRole = AuthRole.USER,
 
-    @Column(name = "deleted_at", columnDefinition = "TIMESTAMP(6) WITH TIME ZONE")
+    @Column(name = "deleted_at")
     var deletedAt: Instant? = null,
 
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false)
-    val accountId: Long? = null
+    var accountId: Long? = null
+        protected set
 
     @Column(
         name = "created_at",
         nullable = false,
-        updatable = false,
-        columnDefinition = "TIMESTAMP(6) WITH TIME ZONE DEFAULT (NOW() AT TIME ZONE 'UTC')"
+        updatable = false
     )
     var createdAt: Instant = Instant.now()
 
     @Column(
         name = "updated_at",
-        nullable = false,
-        columnDefinition = "TIMESTAMP(6) WITH TIME ZONE DEFAULT (NOW() AT TIME ZONE 'UTC')"
+        nullable = false
     )
     var updatedAt: Instant = Instant.now()
 
