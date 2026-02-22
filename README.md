@@ -3,7 +3,7 @@
 ## 기술 스택
 - Backend: Spring Boot
 - Database: PostgreSQL
-- Language: Kotlin, Java
+- Language: Kotlin(jdk-17)
 
 ## 실행 하기
 
