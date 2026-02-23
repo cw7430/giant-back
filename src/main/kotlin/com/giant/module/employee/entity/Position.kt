@@ -20,8 +20,7 @@ class Position(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    var positionId: Long? = null
-        protected set
+    val positionId: Long? = null
 
     @OneToMany(mappedBy = "position", fetch = FetchType.LAZY)
     private val _employeeProfiles: MutableList<EmployeeProfile> = mutableListOf()

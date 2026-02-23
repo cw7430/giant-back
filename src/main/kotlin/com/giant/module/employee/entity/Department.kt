@@ -15,8 +15,7 @@ class Department(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    var departmentId: Long? = null
-        protected set
+    val departmentId: Long? = null
 
     @OneToMany(mappedBy = "department", fetch = FetchType.LAZY)
     private val _teams: MutableList<Team> = mutableListOf()

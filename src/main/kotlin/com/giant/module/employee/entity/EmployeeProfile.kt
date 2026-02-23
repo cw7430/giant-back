@@ -51,21 +51,20 @@ class EmployeeProfile(
 ) {
     @Id
     @Column(name = "id")
-    var employeeId: Long? = null
-        protected set
+    val employeeId: Long? = null
 
     @Column(
         name = "created_at",
         nullable = false,
         updatable = false
     )
-    var createdAt: Instant? = Instant.now()
+    lateinit var createdAt: Instant
 
     @Column(
         name = "updated_at",
         nullable = false
     )
-    var updatedAt: Instant? = Instant.now()
+    lateinit var updatedAt: Instant
 
     @PrePersist
     fun onCreate() {
@@ -103,17 +102,3 @@ class EmployeeProfile(
         }
     }
 }
-
-/*constraint ck_employee_left_state
-       check (((employee_role <> 'LEFT'::employee.employee_role) AND (left_at IS NULL)) OR
-               ((employee_role = 'LEFT'::employee.employee_role) AND (left_at IS NOT NULL)))*/
-/*
-    create index ix_active_employee_created_at
-    on employee.profile (created_at desc)
-    where (employee_role <> 'LEFT'::employee.employee_role);
-    */
-/*
-    create index ix_left_employee_left_at
-    on employee.profile (left_at desc)
-    where (employee_role = 'LEFT'::employee.employee_role);
-    */

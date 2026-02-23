@@ -27,8 +27,7 @@ class RefreshToken(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false)
-    var refreshTokenId: Long? = null
-        protected set
+    val refreshTokenId: Long? = null
 
     companion object {
         fun create(account: Account, token: String, expiresAt: Instant): RefreshToken {

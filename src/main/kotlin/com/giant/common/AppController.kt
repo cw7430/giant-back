@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/v1")
 @Tag(name = "App Controller", description = "공통 API")
-class AppController {
+class AppController(private val appService: AppService) {
 
     @GetMapping("/health-check")
     @Operation(summary = "헬스 체크")
@@ -41,6 +41,12 @@ class AppController {
         )
     )
     fun healthCheck(): ResponseEntity<ResponseDto> {
+        return ResponseEntity.ok(SuccessResponseDto.Simple)
+    }
+
+    @GetMapping("/query-test")
+    fun queryTest(): ResponseEntity<ResponseDto> {
+        appService.queryTest()
         return ResponseEntity.ok(SuccessResponseDto.Simple)
     }
 }
