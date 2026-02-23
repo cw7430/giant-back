@@ -31,25 +31,23 @@ class Account(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false)
-    var accountId: Long? = null
-        protected set
+    val accountId: Long? = null
 
     @Column(
         name = "created_at",
         nullable = false,
         updatable = false
     )
-    var createdAt: Instant = Instant.now()
+    lateinit var createdAt: Instant
 
     @Column(
         name = "updated_at",
         nullable = false
     )
-    var updatedAt: Instant = Instant.now()
+    lateinit var updatedAt: Instant
 
     @OneToOne(mappedBy = "account", cascade = [CascadeType.ALL])
     var employeeProfile: EmployeeProfile? = null
-        protected set
 
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     private val _refreshTokens: MutableList<RefreshToken> = mutableListOf()
@@ -85,25 +83,3 @@ class Account(
         }
     }
 }
-
-/*
-constraint ck_user_deleted_state
-        check (((auth_role <> 'LEFT'::auth.auth_role) AND (deleted_at IS NULL)) OR
-               ((auth_role = 'LEFT'::auth.auth_role) AND (deleted_at IS NOT NULL)))
-*/
-/*
-create unique index uq_user_name
-    on auth.account (user_name)
-    where (auth_role <> 'LEFT'::auth.auth_role);
-*/
-/*
-create index ix_active_user_created_at
-    on auth.account (created_at desc)
-    where (auth_role <> 'LEFT'::auth.auth_role);
-*/
-/*
-create index ix_delete_user_deleted_at
-    on auth.account (deleted_at desc)
-    where (auth_role = 'LEFT'::auth.auth_role);
-*/
-

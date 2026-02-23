@@ -18,8 +18,7 @@ class Team(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
-    var teamId: Long? = null
-        protected set
+    val teamId: Long? = null
 
     @OneToMany(mappedBy = "team", fetch = FetchType.LAZY)
     private var _employeeProfiles: MutableList<EmployeeProfile> = mutableListOf()
