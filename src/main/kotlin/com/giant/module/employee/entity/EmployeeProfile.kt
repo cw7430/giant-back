@@ -32,7 +32,7 @@ class EmployeeProfile(
     @JoinColumn(name = "team_id", nullable = false, foreignKey = ForeignKey(name = "fk_profile_team"))
     var team: Team,
 
-    @Column(name = "employee_role", nullable = false, columnDefinition = "employee.employee_role")
+    @Column(name = "employee_role", nullable = false)
     @Enumerated(EnumType.STRING)
     var employeeRole: EmployeeRole,
 
