@@ -45,6 +45,7 @@ class AppController(private val appService: AppService) {
     }
 
     @GetMapping("/query-test")
+    @Operation(summary = "쿼리 테스트")
     fun queryTest(): ResponseEntity<ResponseDto> {
         appService.queryTest()
         return ResponseEntity.ok(SuccessResponseDto.Simple)

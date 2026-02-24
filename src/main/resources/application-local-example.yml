@@ -25,4 +25,4 @@ jwt:
 logging:
   level:
     org.hibernate.orm.jdbc.bind: trace
-    org.flywaydb: trace
+    org.flywaydb: debug

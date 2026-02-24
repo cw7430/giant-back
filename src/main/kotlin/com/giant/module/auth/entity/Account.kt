@@ -2,10 +2,14 @@ package com.giant.module.auth.entity
 
 import com.giant.module.auth.entity.type.AuthRole
 import jakarta.persistence.*
+import org.hibernate.annotations.DynamicUpdate
+import org.hibernate.annotations.JdbcType
+import org.hibernate.dialect.type.PostgreSQLEnumJdbcType
 import java.time.Instant
 
 @Entity
 @Table(name = "account", schema = "auth")
+@DynamicUpdate
 class Account(
     @Column(name = "user_name", nullable = false, length = 25)
     var userName: String,
@@ -20,6 +24,7 @@ class Account(
     var email: String,
 
     @Column(name = "auth_role", nullable = false)
+    @JdbcType(PostgreSQLEnumJdbcType::class)
     @Enumerated(EnumType.STRING)
     var authRole: AuthRole = AuthRole.USER,
 
@@ -61,6 +66,11 @@ class Account(
     @PreUpdate
     fun onUpdate() {
         updatedAt = Instant.now()
+    }
+
+    fun updatePassword(account: Account, passwordHash: String): Account {
+        this.passwordHash = passwordHash
+        return account
     }
 
     fun withdraw() {

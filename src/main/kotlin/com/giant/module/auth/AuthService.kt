@@ -7,6 +7,7 @@ import com.giant.common.config.security.JwtUtil
 import com.giant.module.auth.dto.request.RefreshRequestDto
 import com.giant.module.auth.dto.request.SignInRequestDto
 import com.giant.module.auth.dto.request.SignOutRequestDto
+import com.giant.module.auth.dto.request.UpdatePasswordRequestDto
 import com.giant.module.auth.dto.response.SignInResponseDto
 import com.giant.module.auth.dto.vo.SignInVo
 import com.giant.module.auth.entity.Account
@@ -91,7 +92,7 @@ class AuthService(
     @Transactional
     fun refresh(request: HttpServletRequest, requestDto: RefreshRequestDto): SignInResponseDto {
         val prevRefreshToken = jwtUtil.extractToken(request)
-        val accountId = jwtUtil.extractUserIdFromRefreshToken(prevRefreshToken)
+        val accountId = jwtUtil.extractUserIdFromRefreshToken()
 
         val refreshTable = refreshTokenRepository.findByToken(prevRefreshToken)
             ?: throw CustomException(ResponseCode.UNAUTHORIZED)
@@ -117,5 +118,22 @@ class AuthService(
         refreshTokenRepository.delete(refreshTable)
 
         log.info { "Sign Out successfully for account ID: ${refreshTable.account.accountId}" }
+    }
+
+    @Transactional
+    fun updatePassword(requestDto: UpdatePasswordRequestDto) {
+        val accountId = jwtUtil.extractUserIdFromAccessToken()
+        val account = accountRepository.findByIdOrNull(accountId)
+            ?: throw CustomException(ResponseCode.UNAUTHORIZED)
+        if (!passwordEncoder.matches(requestDto.prevPassword, account.passwordHash)) {
+            throw CustomException(ResponseCode.UNAUTHORIZED)
+        }
+        if (passwordEncoder.matches(requestDto.newPassword, account.passwordHash)) {
+            throw CustomException(ResponseCode.DUPLICATE_RESOURCE)
+        }
+        val newPasswordHash = passwordEncoder.encode(requestDto.newPassword)!!
+
+        val result = accountRepository.save(account.updatePassword(account, newPasswordHash))
+        log.info { "Update Password successfully for account ID: ${result.accountId}" }
     }
 }
