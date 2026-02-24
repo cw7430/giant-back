@@ -10,7 +10,7 @@ import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.ServletRequestAttributes
 
 @Component
-class JwtUtil(private val jwtProvider: JwtProvider) {
+class JwtUtil {
     /**
      * 필터를 위한 Token 추출
      */
