@@ -3,6 +3,9 @@ package com.giant.module.employee.entity
 import com.giant.module.auth.entity.Account
 import com.giant.module.employee.entity.type.EmployeeRole
 import jakarta.persistence.*
+import org.hibernate.annotations.DynamicUpdate
+import org.hibernate.annotations.JdbcType
+import org.hibernate.dialect.type.PostgreSQLEnumJdbcType
 import java.time.Instant
 
 @Entity
@@ -16,6 +19,7 @@ import java.time.Instant
         Index(name = "ix_profile_updated_by", columnList = "updated_by"),
     ]
 )
+@DynamicUpdate
 class EmployeeProfile(
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)
@@ -33,6 +37,7 @@ class EmployeeProfile(
     var team: Team,
 
     @Column(name = "employee_role", nullable = false)
+    @JdbcType(PostgreSQLEnumJdbcType::class)
     @Enumerated(EnumType.STRING)
     var employeeRole: EmployeeRole,
 

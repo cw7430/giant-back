@@ -4,7 +4,10 @@ import com.giant.common.api.exception.CustomException
 import com.giant.common.api.type.ResponseCode
 import io.jsonwebtoken.Claims
 import jakarta.servlet.http.HttpServletRequest
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
+import org.springframework.web.context.request.RequestContextHolder
+import org.springframework.web.context.request.ServletRequestAttributes
 
 @Component
 class JwtUtil(private val jwtProvider: JwtProvider) {
@@ -30,31 +33,26 @@ class JwtUtil(private val jwtProvider: JwtProvider) {
     }
 
     /**
-     * Claim 추출
-     */
-    private fun getClaims(token: String, isRefresh: Boolean = false): Claims {
-        return jwtProvider.parseClaims(token, isRefresh)
-            ?: throw CustomException(ResponseCode.UNAUTHORIZED)
-    }
-
-    /**
-     * AccessToken 검증
-     */
-    fun validateAccessToken(token: String) {
-        getClaims(token);
-    }
-
-    /**
      * AccessToken 에서 userId 추출
      */
-    fun extractUserIdFromAccessToken(token: String): Long {
-        return getClaims(token).subject.toLong()
+    fun extractUserIdFromAccessToken(): Long {
+        val authentication = SecurityContextHolder.getContext().authentication
+        if (authentication == null || !authentication.isAuthenticated) {
+            throw CustomException(ResponseCode.UNAUTHORIZED)
+        }
+        return authentication.name.toLongOrNull()
+            ?: throw CustomException(ResponseCode.UNAUTHORIZED)
     }
 
     /**
      * RefreshToken 에서 userId 추출
      */
-    fun extractUserIdFromRefreshToken(token: String): Long {
-        return getClaims(token, isRefresh = true).subject.toLong()
+    fun extractUserIdFromRefreshToken(): Long {
+        val attributes = RequestContextHolder.currentRequestAttributes() as? ServletRequestAttributes
+        val claims = attributes?.request?.getAttribute("refreshClaims") as? Claims
+            ?: throw CustomException(ResponseCode.UNAUTHORIZED)
+
+        return claims.subject.toLongOrNull()
+            ?: throw CustomException(ResponseCode.UNAUTHORIZED)
     }
 }
