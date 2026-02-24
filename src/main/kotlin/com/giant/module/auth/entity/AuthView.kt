@@ -2,12 +2,7 @@ package com.giant.module.auth.entity
 
 import com.giant.module.auth.entity.type.AuthRole
 import com.giant.module.employee.entity.type.EmployeeRole
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
-import jakarta.persistence.Id
-import jakarta.persistence.Table
+import jakarta.persistence.*
 import org.hibernate.annotations.Immutable
 
 @Entity
@@ -57,8 +52,8 @@ class AuthView(
     val departmentName: String,
 
     @Column(name = "team_code")
-    var teamCode: String,
+    val teamCode: String,
 
     @Column(name = "team_name")
-    var teamName: String,
+    val teamName: String,
 )

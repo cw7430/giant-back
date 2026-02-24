@@ -1,7 +1,6 @@
 package com.giant.module.auth.entity
 
 import com.giant.module.auth.entity.type.AuthRole
-import com.giant.module.employee.entity.EmployeeProfile
 import jakarta.persistence.*
 import java.time.Instant
 
@@ -45,9 +44,6 @@ class Account(
         nullable = false
     )
     lateinit var updatedAt: Instant
-
-    @OneToOne(mappedBy = "account", cascade = [CascadeType.ALL])
-    var employeeProfile: EmployeeProfile? = null
 
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
     private val _refreshTokens: MutableList<RefreshToken> = mutableListOf()

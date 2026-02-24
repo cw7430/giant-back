@@ -12,6 +12,7 @@ import com.giant.module.auth.dto.vo.SignInVo
 import com.giant.module.auth.entity.Account
 import com.giant.module.auth.entity.RefreshToken
 import com.giant.module.auth.repository.AccountRepository
+import com.giant.module.auth.repository.AuthViewRepository
 import com.giant.module.auth.repository.RefreshTokenRepository
 import jakarta.servlet.http.HttpServletRequest
 import mu.KotlinLogging
@@ -24,6 +25,7 @@ import java.time.Instant
 @Service
 class AuthService(
     private val accountRepository: AccountRepository,
+    private val authViewRepository: AuthViewRepository,
     private val refreshTokenRepository: RefreshTokenRepository,
     private val passwordEncoder: PasswordEncoder,
     private val jwtProvider: JwtProvider,
@@ -68,7 +70,7 @@ class AuthService(
 
     @Transactional
     fun signIn(requestDto: SignInRequestDto): SignInResponseDto {
-        val info = accountRepository.findSignInInfoByUserName(requestDto.userName)
+        val info = authViewRepository.findSignInInfoByUserName(requestDto.userName)
             ?: throw CustomException(ResponseCode.LOGIN_ERROR)
         val account = accountRepository.findByIdOrNull(info.accountId)
             ?: throw CustomException(ResponseCode.LOGIN_ERROR)
@@ -93,7 +95,7 @@ class AuthService(
 
         val refreshTable = refreshTokenRepository.findByToken(prevRefreshToken)
             ?: throw CustomException(ResponseCode.UNAUTHORIZED)
-        val info = accountRepository.findRefreshInfoByAccountId(accountId)
+        val info = authViewRepository.findRefreshInfoByAccountId(accountId)
             ?: throw CustomException(ResponseCode.UNAUTHORIZED)
         refreshTokenRepository.delete(refreshTable)
         val account = accountRepository.findByIdOrNull(info.accountId)
