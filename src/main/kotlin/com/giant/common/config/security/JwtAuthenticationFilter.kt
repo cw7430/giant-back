@@ -22,26 +22,31 @@ class JwtAuthenticationFilter(private val jwtProvider: JwtProvider, private val 
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val token = jwtUtil.extractTokenForFilter(request)
-        if (token == null) {
-            filterChain.doFilter(request, response)
-            return
-        }
+        try {
+            val token = jwtUtil.extractTokenForFilter(request)
 
-        val isRefreshPath = request.requestURI == "/api/v1/auth/refresh"
-        val claims = jwtProvider.parseClaims(token, isRefresh = isRefreshPath)
-
-        if (claims != null) {
-            if (isRefreshPath) {
-                request.setAttribute("refreshClaims", claims)
-            } else {
-                setAuthentication(claims)
+            if (token == null) {
+                filterChain.doFilter(request, response)
+                return
             }
-        }
 
+            val isRefreshPath = request.requestURI == "/api/v1/auth/refresh"
+            val claims = jwtProvider.parseClaims(token, isRefresh = isRefreshPath)
+
+            if (claims != null) {
+                if (isRefreshPath) {
+                    request.setAttribute("refreshClaims", claims)
+                } else {
+                    setAuthentication(claims)
+                }
+            } else {
+                request.setAttribute("exception", "INVALID_TOKEN")
+            }
+        } catch (e: Exception) {
+            request.setAttribute("exception", e)
+        }
         filterChain.doFilter(request, response)
     }
-
     private fun setAuthentication(claims: Claims) {
         val id = claims.subject
         val roleCode = claims.get("accountRole", String::class.java)
