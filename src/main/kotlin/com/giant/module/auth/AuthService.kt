@@ -126,7 +126,7 @@ class AuthService(
         val account = accountRepository.findByIdOrNull(accountId)
             ?: throw CustomException(ResponseCode.UNAUTHORIZED)
         if (!passwordEncoder.matches(requestDto.prevPassword, account.passwordHash)) {
-            throw CustomException(ResponseCode.UNAUTHORIZED)
+            throw CustomException(ResponseCode.PASSWORD_ERROR)
         }
         if (passwordEncoder.matches(requestDto.newPassword, account.passwordHash)) {
             throw CustomException(ResponseCode.DUPLICATE_RESOURCE)
