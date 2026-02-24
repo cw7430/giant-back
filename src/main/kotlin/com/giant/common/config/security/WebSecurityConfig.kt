@@ -1,5 +1,7 @@
 package com.giant.common.config.security
 
+import com.giant.common.api.exception.CustomAccessDeniedHandler
+import com.giant.common.api.exception.CustomAuthenticationEntryPoint
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -17,6 +19,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 @Configuration
 class WebSecurityConfig(
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
+    private val customAccessDeniedHandler: CustomAccessDeniedHandler,
+    private val customAuthenticationEntryPoint: CustomAuthenticationEntryPoint,
     @Value("\${spring.profiles.active}") activeProfile: String
 ) {
     private val allowedOrigins: List<String> = when (activeProfile) {
@@ -28,6 +32,10 @@ class WebSecurityConfig(
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         return http
+            .exceptionHandling { exception ->
+                exception.authenticationEntryPoint(customAuthenticationEntryPoint)
+                exception.accessDeniedHandler(customAccessDeniedHandler)
+            }
             .cors { it.configurationSource(corsConfigurationSource()) }
             .csrf { it.disable() }
             .formLogin { it.disable() }
