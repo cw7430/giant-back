@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.transaction.annotation.Transactional
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -45,6 +46,7 @@ abstract class BaseIntegrationTest {
     lateinit var passwordEncoder: PasswordEncoder
 
     @BeforeEach
+    @Transactional
     fun setUp() {
         val testPasswordHash = passwordEncoder.encode("0000")!!
         val testEmployeeSerial = employeeSerialRepository.save(
@@ -95,6 +97,9 @@ abstract class BaseIntegrationTest {
                 createdBy = testAccountId,
                 updatedBy = testAccountId,
             )
+        )
+        employeeSerialRepository.save(
+            testEmployeeSerial.increaseSerialValue()
         )
     }
 

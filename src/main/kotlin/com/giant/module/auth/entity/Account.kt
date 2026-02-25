@@ -68,9 +68,9 @@ class Account(
         updatedAt = Instant.now()
     }
 
-    fun updatePassword(account: Account, passwordHash: String): Account {
+    fun updatePassword(passwordHash: String): Account {
         this.passwordHash = passwordHash
-        return account
+        return this
     }
 
     fun withdraw() {

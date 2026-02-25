@@ -133,7 +133,7 @@ class AuthService(
         }
         val newPasswordHash = passwordEncoder.encode(requestDto.newPassword)!!
 
-        val result = accountRepository.save(account.updatePassword(account, newPasswordHash))
+        val result = accountRepository.save(account.updatePassword(newPasswordHash))
         log.info { "Update Password successfully for account ID: ${result.accountId}" }
     }
 }

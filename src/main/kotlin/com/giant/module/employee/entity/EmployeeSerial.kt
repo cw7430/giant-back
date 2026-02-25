@@ -1,9 +1,11 @@
 package com.giant.module.employee.entity
 
 import jakarta.persistence.*
+import org.hibernate.annotations.DynamicUpdate
 
 @Entity
 @Table(name = "\"serial\"", schema = "employee")
+@DynamicUpdate
 class EmployeeSerial(
     @Column(name = "serial_name", nullable = false, unique = true)
     var serialName: String,
@@ -16,8 +18,9 @@ class EmployeeSerial(
     @Column(name = "id", nullable = false, updatable = false)
     val serialId: Long? = null
 
-    fun increaseSerialValue(table: EmployeeSerial) {
-        this.serialValue = table.serialValue + 1
+    fun increaseSerialValue(): EmployeeSerial {
+        this.serialValue += 1
+        return this
     }
 
     companion object {
