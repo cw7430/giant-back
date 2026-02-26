@@ -3,7 +3,7 @@ package com.giant.module.employee.entity
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "position", schema = "employee")
+@Table(name = "\"position\"", schema = "employee")
 class Position(
     @Column(name = "position_code", nullable = false, unique = true)
     var positionCode: String,

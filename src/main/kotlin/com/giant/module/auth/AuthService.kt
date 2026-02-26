@@ -126,14 +126,14 @@ class AuthService(
         val account = accountRepository.findByIdOrNull(accountId)
             ?: throw CustomException(ResponseCode.UNAUTHORIZED)
         if (!passwordEncoder.matches(requestDto.prevPassword, account.passwordHash)) {
-            throw CustomException(ResponseCode.UNAUTHORIZED)
+            throw CustomException(ResponseCode.PASSWORD_ERROR)
         }
         if (passwordEncoder.matches(requestDto.newPassword, account.passwordHash)) {
             throw CustomException(ResponseCode.DUPLICATE_RESOURCE)
         }
         val newPasswordHash = passwordEncoder.encode(requestDto.newPassword)!!
 
-        val result = accountRepository.save(account.updatePassword(account, newPasswordHash))
+        val result = accountRepository.save(account.updatePassword(newPasswordHash))
         log.info { "Update Password successfully for account ID: ${result.accountId}" }
     }
 }
