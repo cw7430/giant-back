@@ -5,9 +5,10 @@ spring:
     username: sa
     password:
   jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    # database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
+    defer-datasource-initialization: true
     show-sql: true
     properties:
       hibernate:

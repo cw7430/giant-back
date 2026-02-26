@@ -19,10 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.jdbc.Sql
 import org.springframework.transaction.annotation.Transactional
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Sql("/init_schema_ddl.sql")
+@Sql(scripts = ["/clean_schema.sql"], executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 abstract class BaseIntegrationTest {
     @Autowired
     lateinit var accountRepository: AccountRepository
