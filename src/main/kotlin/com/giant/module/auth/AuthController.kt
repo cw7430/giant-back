@@ -163,6 +163,7 @@ class AuthController(
 
     @PostMapping("/user-name")
     @Operation(summary = "아이디 변경")
+    @SecurityRequirement(name = "AccessToken")
     @ApiResponses(
         ApiResponse(
             responseCode = "200", description = "아이디 변경 성공", content = [
