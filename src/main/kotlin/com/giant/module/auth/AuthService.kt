@@ -4,11 +4,7 @@ import com.giant.common.api.exception.CustomException
 import com.giant.common.api.type.ResponseCode
 import com.giant.common.config.security.JwtProvider
 import com.giant.common.config.security.JwtUtil
-import com.giant.module.auth.dto.request.CheckUserRequestDto
-import com.giant.module.auth.dto.request.RefreshRequestDto
-import com.giant.module.auth.dto.request.SignInRequestDto
-import com.giant.module.auth.dto.request.SignOutRequestDto
-import com.giant.module.auth.dto.request.UpdatePasswordRequestDto
+import com.giant.module.auth.dto.request.*
 import com.giant.module.auth.dto.response.SignInResponseDto
 import com.giant.module.auth.dto.vo.SignInVo
 import com.giant.module.auth.entity.Account
@@ -121,13 +117,28 @@ class AuthService(
         log.info { "Sign Out successfully for account ID: ${refreshTable.account.accountId}" }
     }
 
-    @Transactional
     fun checkUserDuplicate(requestDto: CheckUserRequestDto) {
         val isDuplicate = authViewRepository.existsByUserName(requestDto.userName)
         if (isDuplicate) {
             throw CustomException(ResponseCode.DUPLICATE_RESOURCE)
         }
         log.info { "Check User successfully for User Name: ${requestDto.userName}" }
+    }
+
+    @Transactional
+    fun updateUserName(requestDto: UpdateUserNameRequestDto) {
+        val accountId = jwtUtil.extractUserIdFromAccessToken()
+        val isDuplicate = authViewRepository.existsByUserName(requestDto.userName)
+        if (isDuplicate) {
+            throw CustomException(ResponseCode.DUPLICATE_RESOURCE)
+        }
+        val account = accountRepository.findByIdOrNull(accountId)
+            ?: throw CustomException(ResponseCode.UNAUTHORIZED)
+        if (!passwordEncoder.matches(requestDto.password, account.passwordHash)) {
+            throw CustomException(ResponseCode.PASSWORD_ERROR)
+        }
+        val result = accountRepository.save(account.updateUserName(requestDto.userName))
+        log.info { "Update User Name successfully for account ID: ${result.accountId}" }
     }
 
     @Transactional

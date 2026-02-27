@@ -73,6 +73,11 @@ class Account(
         return this
     }
 
+    fun updateUserName(userName: String): Account {
+        this.userName = userName
+        return this
+    }
+
     fun withdraw() {
         this.authRole = AuthRole.LEFT
         this.deletedAt = Instant.now()

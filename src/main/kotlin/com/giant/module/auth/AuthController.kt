@@ -161,8 +161,65 @@ class AuthController(
         return ResponseEntity.ok(SuccessResponseDto.Simple)
     }
 
+    @PostMapping("/user-name")
+    @Operation(summary = "아이디 변경")
+    @ApiResponses(
+        ApiResponse(
+            responseCode = "200", description = "아이디 변경 성공", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = SuccessResponseDoc::class)
+                )
+            ]
+        ),
+        ApiResponse(
+            responseCode = "400", description = "입력 값 오류", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDoc.BadRequest::class)
+                )
+            ]
+        ),
+        ApiResponse(
+            responseCode = "401", description = "인증 오류", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDoc.Unauthorized::class)
+                )
+            ]
+        ),
+        ApiResponse(
+            responseCode = "401", description = "잘못된 비밀번호", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDoc.PasswordError::class)
+                )
+            ]
+        ),
+        ApiResponse(
+            responseCode = "409", description = "아이디 중복", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDoc.DuplicateResource::class)
+                )
+            ]
+        ),
+        ApiResponse(
+            responseCode = "500", description = "기타오류", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDoc.InternalServerError::class)
+                )
+            ]
+        )
+    )
+    fun updateUserName(@RequestBody @Valid requestDto: UpdateUserNameRequestDto): ResponseEntity<ResponseDto> {
+        authService.updateUserName(requestDto)
+        return ResponseEntity.ok(SuccessResponseDto.Simple)
+    }
 
-    @PatchMapping("/password")
+
+    @PostMapping("/password")
     @Operation(summary = "비밀번호 변경")
     @SecurityRequirement(name = "AccessToken")
     @ApiResponses(
@@ -187,6 +244,14 @@ class AuthController(
                 Content(
                     mediaType = "application/json",
                     schema = Schema(implementation = ErrorResponseDoc.Unauthorized::class)
+                )
+            ]
+        ),
+        ApiResponse(
+            responseCode = "401", description = "잘못된 비밀번호", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDoc.PasswordError::class)
                 )
             ]
         ),
