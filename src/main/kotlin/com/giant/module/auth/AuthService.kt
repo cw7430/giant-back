@@ -4,6 +4,7 @@ import com.giant.common.api.exception.CustomException
 import com.giant.common.api.type.ResponseCode
 import com.giant.common.config.security.JwtProvider
 import com.giant.common.config.security.JwtUtil
+import com.giant.module.auth.dto.request.CheckUserRequestDto
 import com.giant.module.auth.dto.request.RefreshRequestDto
 import com.giant.module.auth.dto.request.SignInRequestDto
 import com.giant.module.auth.dto.request.SignOutRequestDto
@@ -118,6 +119,15 @@ class AuthService(
         refreshTokenRepository.delete(refreshTable)
 
         log.info { "Sign Out successfully for account ID: ${refreshTable.account.accountId}" }
+    }
+
+    @Transactional
+    fun checkUserDuplicate(requestDto: CheckUserRequestDto) {
+        val isDuplicate = authViewRepository.existsByUserName(requestDto.userName)
+        if (isDuplicate) {
+            throw CustomException(ResponseCode.DUPLICATE_RESOURCE)
+        }
+        log.info { "Check User successfully for User Name: ${requestDto.userName}" }
     }
 
     @Transactional
