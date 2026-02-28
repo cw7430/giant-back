@@ -45,7 +45,7 @@ class WebSecurityConfig(
                 it.requestMatchers(
                     "/swagger-ui/**", "/api-docs/**", "/api/v1/health-check", "/api/v1/query-test",
                     "/api/v1/auth/sign-in", "/api/v1/auth/sign-out", "/api/v1/auth/check-user",
-                    "/api/v1/auth/refresh"
+                    "/api/v1/auth/refresh", "/api/v1/auth/account"
                 ).permitAll()
                     .requestMatchers("/api/v1/auth/account", "/api/v1/auth/password", "/api/v1/auth/user-name")
                     .hasAnyRole("USER", "ADMIN")

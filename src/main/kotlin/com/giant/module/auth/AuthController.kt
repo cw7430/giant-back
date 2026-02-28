@@ -277,4 +277,54 @@ class AuthController(
         authService.updatePassword(requestDto)
         return ResponseEntity.ok(SuccessResponseDto.Simple)
     }
+
+    @PatchMapping("/account")
+    @Operation(summary = "계정정보 변경")
+    @SecurityRequirement(name = "AccessToken")
+    @ApiResponses(
+        ApiResponse(
+            responseCode = "200", description = "계정정보 변경 성공", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = SuccessResponseDoc::class)
+                )
+            ]
+        ),
+        ApiResponse(
+            responseCode = "400", description = "입력 값 오류", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDoc.BadRequest::class)
+                )
+            ]
+        ),
+        ApiResponse(
+            responseCode = "401", description = "인증 오류", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDoc.Unauthorized::class)
+                )
+            ]
+        ),
+        ApiResponse(
+            responseCode = "401", description = "잘못된 비밀번호", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDoc.PasswordError::class)
+                )
+            ]
+        ),
+        ApiResponse(
+            responseCode = "500", description = "기타오류", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDoc.InternalServerError::class)
+                )
+            ]
+        )
+    )
+    fun updateAccount(@RequestBody @Valid requestDto: UpdateAccountRequestDto): ResponseEntity<ResponseDto> {
+        authService.updateAccount(requestDto)
+        return ResponseEntity.ok(SuccessResponseDto.Simple)
+    }
 }

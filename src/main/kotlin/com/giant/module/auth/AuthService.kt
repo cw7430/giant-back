@@ -157,4 +157,18 @@ class AuthService(
         val result = accountRepository.save(account.updatePassword(newPasswordHash))
         log.info { "Update Password successfully for account ID: ${result.accountId}" }
     }
+
+    @Transactional
+    fun updateAccount(requestDto: UpdateAccountRequestDto) {
+        val accountId = jwtUtil.extractUserIdFromAccessToken()
+        val account = accountRepository.findByIdOrNull(accountId)
+            ?: throw CustomException(ResponseCode.UNAUTHORIZED)
+        if (!passwordEncoder.matches(requestDto.password, account.passwordHash)) {
+            throw CustomException(ResponseCode.PASSWORD_ERROR)
+        }
+        val result = accountRepository.save(
+            account.updateAccount(requestDto.phoneNumber, requestDto.email)
+        )
+        log.info { "Update User successfully for account ID: ${result.accountId}" }
+    }
 }

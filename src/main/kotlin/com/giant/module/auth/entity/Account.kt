@@ -31,7 +31,7 @@ class Account(
     @Column(name = "deleted_at")
     var deletedAt: Instant? = null,
 
-) {
+    ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false)
@@ -75,6 +75,16 @@ class Account(
 
     fun updateUserName(userName: String): Account {
         this.userName = userName
+        return this
+    }
+
+    fun updateAccount(phoneNumber: String?, email: String?): Account {
+        if (phoneNumber != null && phoneNumber != this.phoneNumber) {
+            this.phoneNumber = phoneNumber
+        }
+        if (email != null && email != this.email) {
+            this.email = email
+        }
         return this
     }
 
