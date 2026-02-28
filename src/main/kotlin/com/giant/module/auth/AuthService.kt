@@ -4,10 +4,7 @@ import com.giant.common.api.exception.CustomException
 import com.giant.common.api.type.ResponseCode
 import com.giant.common.config.security.JwtProvider
 import com.giant.common.config.security.JwtUtil
-import com.giant.module.auth.dto.request.RefreshRequestDto
-import com.giant.module.auth.dto.request.SignInRequestDto
-import com.giant.module.auth.dto.request.SignOutRequestDto
-import com.giant.module.auth.dto.request.UpdatePasswordRequestDto
+import com.giant.module.auth.dto.request.*
 import com.giant.module.auth.dto.response.SignInResponseDto
 import com.giant.module.auth.dto.vo.SignInVo
 import com.giant.module.auth.entity.Account
@@ -120,6 +117,30 @@ class AuthService(
         log.info { "Sign Out successfully for account ID: ${refreshTable.account.accountId}" }
     }
 
+    fun checkUserDuplicate(requestDto: CheckUserRequestDto) {
+        val isDuplicate = authViewRepository.existsByUserName(requestDto.userName)
+        if (isDuplicate) {
+            throw CustomException(ResponseCode.DUPLICATE_RESOURCE)
+        }
+        log.info { "Check User successfully for User Name: ${requestDto.userName}" }
+    }
+
+    @Transactional
+    fun updateUserName(requestDto: UpdateUserNameRequestDto) {
+        val accountId = jwtUtil.extractUserIdFromAccessToken()
+        val isDuplicate = authViewRepository.existsByUserName(requestDto.userName)
+        if (isDuplicate) {
+            throw CustomException(ResponseCode.DUPLICATE_RESOURCE)
+        }
+        val account = accountRepository.findByIdOrNull(accountId)
+            ?: throw CustomException(ResponseCode.UNAUTHORIZED)
+        if (!passwordEncoder.matches(requestDto.password, account.passwordHash)) {
+            throw CustomException(ResponseCode.PASSWORD_ERROR)
+        }
+        val result = account.updateUserName(requestDto.userName)
+        log.info { "Update User Name successfully for account ID: ${result.accountId}" }
+    }
+
     @Transactional
     fun updatePassword(requestDto: UpdatePasswordRequestDto) {
         val accountId = jwtUtil.extractUserIdFromAccessToken()
@@ -133,7 +154,20 @@ class AuthService(
         }
         val newPasswordHash = passwordEncoder.encode(requestDto.newPassword)!!
 
-        val result = accountRepository.save(account.updatePassword(newPasswordHash))
+        val result = account.updatePassword(newPasswordHash)
         log.info { "Update Password successfully for account ID: ${result.accountId}" }
+    }
+
+    @Transactional
+    fun updateAccount(requestDto: UpdateAccountRequestDto) {
+        val accountId = jwtUtil.extractUserIdFromAccessToken()
+        val account = accountRepository.findByIdOrNull(accountId)
+            ?: throw CustomException(ResponseCode.UNAUTHORIZED)
+        if (!passwordEncoder.matches(requestDto.password, account.passwordHash)) {
+            throw CustomException(ResponseCode.PASSWORD_ERROR)
+        }
+        requestDto.phoneNumber?.let { account.phoneNumber = it }
+        requestDto.email?.let { account.email = it }
+        log.info { "Update User successfully for account ID: $accountId" }
     }
 }

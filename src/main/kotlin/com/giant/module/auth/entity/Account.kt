@@ -31,7 +31,7 @@ class Account(
     @Column(name = "deleted_at")
     var deletedAt: Instant? = null,
 
-) {
+    ) {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, updatable = false)
@@ -71,6 +71,16 @@ class Account(
     fun updatePassword(passwordHash: String): Account {
         this.passwordHash = passwordHash
         return this
+    }
+
+    fun updateUserName(userName: String): Account {
+        this.userName = userName
+        return this
+    }
+
+    fun updateAccount(phoneNumber: String?, email: String?) {
+        phoneNumber?.let { this.phoneNumber = it }
+        email?.let { this.email = it }
     }
 
     fun withdraw() {

@@ -35,6 +35,15 @@ class ErrorResponseDoc {
         val message: String? = null
     }
 
+    /** 401 Unauthorized */
+    class PasswordError {
+        @get:Schema(example = "PWE")
+        val code: String? = null
+
+        @get:Schema(example = "비빌번호가 잘못되었습니다.")
+        val message: String? = null
+    }
+
     /** 403 Forbidden */
     class Forbidden {
         @get:Schema(example = "FB")
