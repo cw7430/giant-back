@@ -78,14 +78,9 @@ class Account(
         return this
     }
 
-    fun updateAccount(phoneNumber: String?, email: String?): Account {
-        if (phoneNumber != null && phoneNumber != this.phoneNumber) {
-            this.phoneNumber = phoneNumber
-        }
-        if (email != null && email != this.email) {
-            this.email = email
-        }
-        return this
+    fun updateAccount(phoneNumber: String?, email: String?) {
+        phoneNumber?.let { this.phoneNumber = it }
+        email?.let { this.email = it }
     }
 
     fun withdraw() {

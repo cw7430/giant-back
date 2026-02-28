@@ -137,7 +137,7 @@ class AuthService(
         if (!passwordEncoder.matches(requestDto.password, account.passwordHash)) {
             throw CustomException(ResponseCode.PASSWORD_ERROR)
         }
-        val result = accountRepository.save(account.updateUserName(requestDto.userName))
+        val result = account.updateUserName(requestDto.userName)
         log.info { "Update User Name successfully for account ID: ${result.accountId}" }
     }
 
@@ -154,7 +154,7 @@ class AuthService(
         }
         val newPasswordHash = passwordEncoder.encode(requestDto.newPassword)!!
 
-        val result = accountRepository.save(account.updatePassword(newPasswordHash))
+        val result = account.updatePassword(newPasswordHash)
         log.info { "Update Password successfully for account ID: ${result.accountId}" }
     }
 
@@ -166,9 +166,8 @@ class AuthService(
         if (!passwordEncoder.matches(requestDto.password, account.passwordHash)) {
             throw CustomException(ResponseCode.PASSWORD_ERROR)
         }
-        val result = accountRepository.save(
-            account.updateAccount(requestDto.phoneNumber, requestDto.email)
-        )
-        log.info { "Update User successfully for account ID: ${result.accountId}" }
+        requestDto.phoneNumber?.let { account.phoneNumber = it }
+        requestDto.email?.let { account.email = it }
+        log.info { "Update User successfully for account ID: $accountId" }
     }
 }
