@@ -5,6 +5,8 @@ spring:
     driver-class-name: org.postgresql.Driver
   jackson:
     time-zone: UTC
+    mapper:
+      accept-case-insensitive-enums: true
   profiles:
     active: local
 

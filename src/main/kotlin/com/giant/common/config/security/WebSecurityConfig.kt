@@ -47,7 +47,10 @@ class WebSecurityConfig(
                     "/api/v1/auth/sign-in", "/api/v1/auth/sign-out", "/api/v1/auth/check-user",
                     "/api/v1/auth/refresh", "/api/v1/auth/account"
                 ).permitAll()
-                    .requestMatchers("/api/v1/auth/account", "/api/v1/auth/password", "/api/v1/auth/user-name")
+                    .requestMatchers(
+                        "/api/v1/auth/account", "/api/v1/auth/password", "/api/v1/auth/user-name",
+                        "/api/v1/hr/profiles"
+                    )
                     .hasAnyRole("USER", "ADMIN")
                     .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                     .anyRequest().authenticated()

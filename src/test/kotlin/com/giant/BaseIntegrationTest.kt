@@ -2,17 +2,9 @@ package com.giant
 
 import com.giant.module.auth.entity.Account
 import com.giant.module.auth.repository.AccountRepository
-import com.giant.module.employee.entity.Department
-import com.giant.module.employee.entity.EmployeeProfile
-import com.giant.module.employee.entity.EmployeeSerial
-import com.giant.module.employee.entity.Position
-import com.giant.module.employee.entity.Team
+import com.giant.module.employee.entity.*
 import com.giant.module.employee.entity.type.EmployeeRole
-import com.giant.module.employee.repository.DepartmentRepository
-import com.giant.module.employee.repository.EmployeeProfileRepository
-import com.giant.module.employee.repository.EmployeeSerialRepository
-import com.giant.module.employee.repository.PositionRepository
-import com.giant.module.employee.repository.TeamRepository
+import com.giant.module.employee.repository.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired

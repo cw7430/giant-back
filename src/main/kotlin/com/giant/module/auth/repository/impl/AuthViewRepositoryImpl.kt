@@ -34,11 +34,11 @@ class AuthViewRepositoryImpl(private val queryFactory: JPAQueryFactory) : AuthVi
             .fetchOne()
     }
 
-    override fun findSignInInfoByUserName(userName: String): SignInVo? {
-        return findSignInInfo(QAuthView.authView.userName.eq(userName))
-    }
+    override fun findSignInInfoByUserName(userName: String): SignInVo? =
+        findSignInInfo(QAuthView.authView.userName.eq(userName))
 
-    override fun findRefreshInfoByAccountId(accountId: Long): SignInVo? {
-        return findSignInInfo(QAuthView.authView.accountId.eq(accountId))
-    }
+
+    override fun findRefreshInfoByAccountId(accountId: Long): SignInVo? =
+        findSignInInfo(QAuthView.authView.accountId.eq(accountId))
+
 }
