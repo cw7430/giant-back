@@ -24,22 +24,22 @@ class EmployeeProfileView(
     val employeeName: String,
 
     @Column(name = "position_code")
-    val positionCode: String?,
+    val positionCode: String,
 
     @Column(name = "position_name")
-    val positionName: String?,
+    val positionName: String,
 
     @Column(name = "department_code")
-    val departmentCode: String?,
+    val departmentCode: String,
 
     @Column(name = "department_name")
-    val departmentName: String?,
+    val departmentName: String,
 
     @Column(name = "team_code")
-    val teamCode: String?,
+    val teamCode: String,
 
     @Column(name = "team_name")
-    val teamName: String?,
+    val teamName: String,
 
     @Column(name = "phone_number")
     val phoneNumber: String,
@@ -47,8 +47,14 @@ class EmployeeProfileView(
     @Column(name = "email")
     val email: String,
 
+    @Column(name = "created_by")
+    val createdBy: Long?,
+
     @Column(name = "created_employee_name")
     val createdEmployeeName: String?,
+
+    @Column(name = "updated_by")
+    val updatedBy: Long?,
 
     @Column(name = "updated_employee_name")
     val updatedEmployeeName: String?,
