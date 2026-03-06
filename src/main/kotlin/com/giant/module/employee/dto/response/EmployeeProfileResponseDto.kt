@@ -22,5 +22,5 @@ data class EmployeeProfileResponseDto(
     val updatedEmployeeName: String?,
     val createdAt: Instant,
     val updatedAt: Instant,
-    val leftAt: Instant
+    val leftAt: Instant?
 )

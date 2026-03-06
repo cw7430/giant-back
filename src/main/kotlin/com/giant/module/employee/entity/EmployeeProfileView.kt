@@ -3,6 +3,8 @@ package com.giant.module.employee.entity
 import com.giant.module.employee.entity.type.EmployeeRole
 import jakarta.persistence.*
 import org.hibernate.annotations.Immutable
+import org.hibernate.annotations.JdbcType
+import org.hibernate.dialect.type.PostgreSQLEnumJdbcType
 import java.time.Instant
 
 @Entity
@@ -18,6 +20,7 @@ class EmployeeProfileView(
 
     @Column(name = "employee_role")
     @Enumerated(EnumType.STRING)
+    @JdbcType(PostgreSQLEnumJdbcType::class)
     val employeeRole: EmployeeRole,
 
     @Column(name = "employee_name")
