@@ -2,10 +2,13 @@ package com.giant.module.employee.dto.response
 
 import com.giant.module.employee.entity.type.EmployeeRole
 import io.swagger.v3.oas.annotations.media.Schema
+import tools.jackson.databind.annotation.JsonSerialize
+import tools.jackson.databind.ser.std.ToStringSerializer
 import java.time.Instant
 
 data class EmployeeProfileResponseDto(
-    @get:Schema(description = "일련번호", example = "1")
+    @get:Schema(description = "일련번호", example = "1", type = "string")
+    @get:JsonSerialize(using = ToStringSerializer::class)
     val employeeId: Long,
 
     @get:Schema(description = "사번", example = "EMP001")
@@ -41,13 +44,15 @@ data class EmployeeProfileResponseDto(
     @get:Schema(description = "이메일", example = "example@example.com")
     val email: String,
 
-    @get:Schema(description = "작성자 일련번호", example = "1")
+    @get:Schema(description = "작성자 일련번호", example = "1", type="string")
+    @get:JsonSerialize(using = ToStringSerializer::class)
     val createdBy: Long?,
 
     @get:Schema(description = "작성자 이름", example = "이사장")
     val createdEmployeeName: String?,
 
-    @get:Schema(description = "수정자 일련번호", example = "1")
+    @get:Schema(description = "수정자 일련번호", example = "1", type="string")
+    @get:JsonSerialize(using = ToStringSerializer::class)
     val updatedBy: Long?,
 
     @get:Schema(description = "수정자 이름", example = "이사장")

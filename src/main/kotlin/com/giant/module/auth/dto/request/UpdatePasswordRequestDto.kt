@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Pattern
 @Schema(name = "UpdatePasswordRequest")
 data class UpdatePasswordRequestDto(
     @field:NotBlank(message = "기존 비밀번호를 입력해주세요.")
-    @get:Schema(description = "기존 비밀번호", example = "examplepw1234")
+    @get:Schema(description = "기존 비밀번호", example = "examplepw1234!@")
     val prevPassword: String,
 
     @field:NotBlank(message = "새 비밀번호를 입력해주세요.")

@@ -11,7 +11,7 @@ data class SignInRequestDto(
 
 
     @field:NotBlank(message = "비밀번호를 입력해주세요.")
-    @get:Schema(description = "비빌번호", example = "examplepw1234")
+    @get:Schema(description = "비빌번호", example = "examplepw1234!@")
     val password: String,
 
     @get:Schema(description = "장기 로그인", example = "false")
