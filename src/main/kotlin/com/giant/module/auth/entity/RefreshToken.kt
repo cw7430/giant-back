@@ -29,6 +29,12 @@ class RefreshToken(
     @Column(name = "id", nullable = false, updatable = false)
     val refreshTokenId: Long? = null
 
+    fun update(token: String, expiresAt: Instant): RefreshToken {
+        this.token = token
+        this.expiresAt = expiresAt
+        return this
+    }
+
     companion object {
         fun create(account: Account, token: String, expiresAt: Instant): RefreshToken {
             return RefreshToken(

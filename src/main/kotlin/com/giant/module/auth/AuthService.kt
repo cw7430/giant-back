@@ -36,6 +36,7 @@ class AuthService(
         info: SignInVo,
         isAuto: Boolean,
         account: Account,
+        refreshToken: RefreshToken? = null,
     ): SignInResponseDto {
         authUtil.validateAuthRole(info)
 
@@ -51,12 +52,11 @@ class AuthService(
         val refreshTokenExpiresAtMs = refreshClaims.expiresAtMs
         val refreshTokenExpiresAtDate = Instant.ofEpochMilli(refreshTokenExpiresAtMs)
 
-        refreshTokenRepository.save(
-            RefreshToken.create(
-                account,
-                token = refreshClaims.token,
-                expiresAt = refreshTokenExpiresAtDate
-            )
+        upsertRefreshToken(
+            account,
+            token = refreshClaims.token,
+            expiresAt = refreshTokenExpiresAtDate,
+            refreshToken
         )
 
         return authUtil.buildSignInResponse(
@@ -64,6 +64,18 @@ class AuthService(
             refreshToken = refreshClaims.token, isAuto,
             refreshTokenExpiresAtMs
         )
+    }
+
+    fun upsertRefreshToken(
+        account: Account,
+        token: String,
+        expiresAt: Instant,
+        refreshToken: RefreshToken?
+    ) {
+        refreshToken?.update(token, expiresAt)
+            ?: refreshTokenRepository.save(
+                RefreshToken.create(account, token, expiresAt)
+            )
     }
 
     @Transactional
@@ -95,7 +107,6 @@ class AuthService(
             ?: throw CustomException(ResponseCode.UNAUTHORIZED)
         val info = authViewRepository.findRefreshInfoByAccountId(accountId)
             ?: throw CustomException(ResponseCode.UNAUTHORIZED)
-        refreshTokenRepository.delete(refreshTable)
         val account = accountRepository.findByIdOrNull(info.accountId)
             ?: throw CustomException(ResponseCode.UNAUTHORIZED)
 
@@ -104,7 +115,8 @@ class AuthService(
         return issueTokensAndBuild(
             info = info,
             isAuto = requestDto.isAuto,
-            account = account
+            account = account,
+            refreshToken = refreshTable
         )
     }
 
