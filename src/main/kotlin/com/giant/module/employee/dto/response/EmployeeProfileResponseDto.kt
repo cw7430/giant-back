@@ -1,5 +1,6 @@
 package com.giant.module.employee.dto.response
 
+import com.giant.module.employee.entity.EmployeeProfileView
 import com.giant.module.employee.entity.type.EmployeeRole
 import io.swagger.v3.oas.annotations.media.Schema
 import tools.jackson.databind.annotation.JsonSerialize
@@ -44,14 +45,14 @@ data class EmployeeProfileResponseDto(
     @get:Schema(description = "이메일", example = "example@example.com")
     val email: String,
 
-    @get:Schema(description = "작성자 일련번호", example = "1", type="string")
+    @get:Schema(description = "작성자 일련번호", example = "1", type = "string")
     @get:JsonSerialize(using = ToStringSerializer::class)
     val createdBy: Long?,
 
     @get:Schema(description = "작성자 이름", example = "이사장")
     val createdEmployeeName: String?,
 
-    @get:Schema(description = "수정자 일련번호", example = "1", type="string")
+    @get:Schema(description = "수정자 일련번호", example = "1", type = "string")
     @get:JsonSerialize(using = ToStringSerializer::class)
     val updatedBy: Long?,
 
@@ -66,4 +67,28 @@ data class EmployeeProfileResponseDto(
 
     @get:Schema(description = "퇴사일", example = "null")
     val leftAt: Instant?
-)
+) {
+    companion object {
+        fun from(entity: EmployeeProfileView) = EmployeeProfileResponseDto(
+            entity.employeeId,
+            entity.employeeCode,
+            entity.employeeRole,
+            entity.employeeName,
+            entity.positionCode,
+            entity.positionName,
+            entity.departmentCode,
+            entity.departmentName,
+            entity.teamCode,
+            entity.teamName,
+            entity.phoneNumber,
+            entity.email,
+            entity.createdBy,
+            entity.createdEmployeeName,
+            entity.updatedBy,
+            entity.updatedEmployeeName,
+            entity.createdAt,
+            entity.updatedAt,
+            entity.leftAt
+        )
+    }
+}
