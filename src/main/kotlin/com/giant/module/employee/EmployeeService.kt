@@ -5,8 +5,10 @@ import com.giant.common.api.response.PageResponse
 import com.giant.common.api.type.ResponseCode
 import com.giant.common.config.security.JwtUtil
 import com.giant.module.employee.dto.request.EmployeeProfilesRequestDto
+import com.giant.module.employee.dto.response.DepartmentResponseDto
 import com.giant.module.employee.dto.response.EmployeeProfileResponseDto
 import com.giant.module.employee.dto.response.PositionResponseDto
+import com.giant.module.employee.repository.DepartmentRepository
 import com.giant.module.employee.repository.EmployeeProfileViewRepository
 import com.giant.module.employee.repository.PositionRepository
 import mu.KotlinLogging
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service
 class EmployeeService(
     private val employeeProfileViewRepository: EmployeeProfileViewRepository,
     private val positionRepository: PositionRepository,
+    private val departmentRepository: DepartmentRepository,
     private val jwtUtil: JwtUtil,
 ) {
     private val log = KotlinLogging.logger {}
@@ -49,6 +52,16 @@ class EmployeeService(
 
         return positions.map { position ->
             PositionResponseDto.from(position)
+        }
+    }
+
+    fun getDepartments(): List<DepartmentResponseDto> {
+        val accountId = jwtUtil.extractUserIdFromAccessToken()
+        val departments = departmentRepository.findAll()
+        log.info { "Department requested by account ID: $accountId" }
+
+        return departments.map { dept ->
+            DepartmentResponseDto.from(dept)
         }
     }
 }

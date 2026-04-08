@@ -3,8 +3,10 @@ package com.giant.module.employee
 import com.giant.common.api.doc.error.ErrorResponseDoc
 import com.giant.common.api.response.ResponseDto
 import com.giant.common.api.response.SuccessResponseDto
+import com.giant.module.employee.doc.DepartmentsResponseDoc
 import com.giant.module.employee.doc.EmployeeProfileResponseDoc
 import com.giant.module.employee.doc.EmployeeProfilesResponseDoc
+import com.giant.module.employee.doc.PositionsResponseDoc
 import com.giant.module.employee.dto.request.EmployeeProfilesRequestDto
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -120,7 +122,7 @@ class EmployeeController(
             responseCode = "200", description = "직급 목록 조회 성공", content = [
                 Content(
                     mediaType = "application/json",
-                    schema = Schema(implementation = EmployeeProfileResponseDoc::class)
+                    schema = Schema(implementation = PositionsResponseDoc::class)
                 )
             ]
         ),
@@ -143,4 +145,36 @@ class EmployeeController(
     )
     fun getPositions(): ResponseEntity<ResponseDto> =
         ResponseEntity.ok(SuccessResponseDto.WithResult(employeeService.getPositions()))
+
+    @GetMapping("/departments")
+    @Operation(summary = "부서 목록")
+    @SecurityRequirement(name = "AccessToken")
+    @ApiResponses(
+        ApiResponse(
+            responseCode = "200", description = "부서 목록 조회 성공", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = DepartmentsResponseDoc::class)
+                )
+            ]
+        ),
+        ApiResponse(
+            responseCode = "401", description = "인증 오류", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDoc.Unauthorized::class)
+                )
+            ]
+        ),
+        ApiResponse(
+            responseCode = "500", description = "기타 오류", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDoc.InternalServerError::class)
+                )
+            ]
+        )
+    )
+    fun getDepartments(): ResponseEntity<ResponseDto> =
+        ResponseEntity.ok(SuccessResponseDto.WithResult(employeeService.getDepartments()))
 }

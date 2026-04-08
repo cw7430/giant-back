@@ -1,5 +1,6 @@
 package com.giant.module.employee.dto.response
 
+import com.giant.module.employee.entity.Department
 import io.swagger.v3.oas.annotations.media.ArraySchema
 import io.swagger.v3.oas.annotations.media.Schema
 import tools.jackson.databind.annotation.JsonSerialize
@@ -18,4 +19,13 @@ data class DepartmentResponseDto(
 
     @get:ArraySchema(schema = Schema(implementation = TeamResponseDto::class))
     val teams: List<TeamResponseDto>? = null
-)
+) {
+    companion object {
+        fun from(entity: Department) = DepartmentResponseDto(
+            entity.departmentId!!,
+            entity.departmentCode,
+            entity.departmentName,
+            entity.teams.map { TeamResponseDto.from(it) }
+        )
+    }
+}
