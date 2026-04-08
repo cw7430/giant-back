@@ -110,4 +110,37 @@ class EmployeeController(
     )
     fun getEmployeeProfile(@PathVariable id: Long): ResponseEntity<ResponseDto> =
         ResponseEntity.ok(SuccessResponseDto.WithResult(employeeService.getEmployeeProfile(id)))
+
+
+    @GetMapping("/positions")
+    @Operation(summary = "직급 목록")
+    @SecurityRequirement(name = "AccessToken")
+    @ApiResponses(
+        ApiResponse(
+            responseCode = "200", description = "직급 목록 조회 성공", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = EmployeeProfileResponseDoc::class)
+                )
+            ]
+        ),
+        ApiResponse(
+            responseCode = "401", description = "인증 오류", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDoc.Unauthorized::class)
+                )
+            ]
+        ),
+        ApiResponse(
+            responseCode = "500", description = "기타 오류", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDoc.InternalServerError::class)
+                )
+            ]
+        )
+    )
+    fun getPositions(): ResponseEntity<ResponseDto> =
+        ResponseEntity.ok(SuccessResponseDto.WithResult(employeeService.getPositions()))
 }
