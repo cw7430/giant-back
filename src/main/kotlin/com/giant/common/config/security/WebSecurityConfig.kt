@@ -49,7 +49,8 @@ class WebSecurityConfig(
                 ).permitAll()
                     .requestMatchers(
                         "/api/v1/auth/account", "/api/v1/auth/password", "/api/v1/auth/user-name",
-                        "/api/v1/hr/profiles", "/api/v1/hr/positions", "/api/v1/hr/departments"
+                        "/api/v1/hr/profiles", "/api/v1/hr/positions", "/api/v1/hr/departments",
+                        "/api/v1/hr/employee-code"
                     )
                     .hasAnyRole("USER", "ADMIN")
                     .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")

@@ -4,6 +4,7 @@ import com.giant.common.api.doc.error.ErrorResponseDoc
 import com.giant.common.api.response.ResponseDto
 import com.giant.common.api.response.SuccessResponseDto
 import com.giant.module.employee.doc.DepartmentsResponseDoc
+import com.giant.module.employee.doc.EmployeeCodeResponseDoc
 import com.giant.module.employee.doc.EmployeeProfileResponseDoc
 import com.giant.module.employee.doc.EmployeeProfilesResponseDoc
 import com.giant.module.employee.doc.PositionsResponseDoc
@@ -177,4 +178,36 @@ class EmployeeController(
     )
     fun getDepartments(): ResponseEntity<ResponseDto> =
         ResponseEntity.ok(SuccessResponseDto.WithResult(employeeService.getDepartments()))
+
+    @GetMapping("/employee-code")
+    @Operation(summary = "사번 조회")
+    @SecurityRequirement(name = "AccessToken")
+    @ApiResponses(
+        ApiResponse(
+            responseCode = "200", description = "사번 조회 성공", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = EmployeeCodeResponseDoc::class)
+                )
+            ]
+        ),
+        ApiResponse(
+            responseCode = "401", description = "인증 오류", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDoc.Unauthorized::class)
+                )
+            ]
+        ),
+        ApiResponse(
+            responseCode = "500", description = "기타 오류", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDoc.InternalServerError::class)
+                )
+            ]
+        )
+    )
+    fun getEmployeeCode(): ResponseEntity<ResponseDto> =
+        ResponseEntity.ok(SuccessResponseDto.WithResult(employeeService.getEmployeeCode()))
 }

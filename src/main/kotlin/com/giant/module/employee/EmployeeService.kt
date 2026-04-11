@@ -6,10 +6,12 @@ import com.giant.common.api.type.ResponseCode
 import com.giant.common.config.security.JwtUtil
 import com.giant.module.employee.dto.request.EmployeeProfilesRequestDto
 import com.giant.module.employee.dto.response.DepartmentResponseDto
+import com.giant.module.employee.dto.response.EmployeeCodeResponseDto
 import com.giant.module.employee.dto.response.EmployeeProfileResponseDto
 import com.giant.module.employee.dto.response.PositionResponseDto
 import com.giant.module.employee.repository.DepartmentRepository
 import com.giant.module.employee.repository.EmployeeProfileViewRepository
+import com.giant.module.employee.repository.EmployeeSerialRepository
 import com.giant.module.employee.repository.PositionRepository
 import mu.KotlinLogging
 import org.springframework.data.repository.findByIdOrNull
@@ -17,12 +19,20 @@ import org.springframework.stereotype.Service
 
 @Service
 class EmployeeService(
+    private val employeeSerialRepository: EmployeeSerialRepository,
     private val employeeProfileViewRepository: EmployeeProfileViewRepository,
     private val positionRepository: PositionRepository,
     private val departmentRepository: DepartmentRepository,
     private val jwtUtil: JwtUtil,
 ) {
     private val log = KotlinLogging.logger {}
+
+    fun getEmployeeSerial(): String {
+        val employeeSerial = employeeSerialRepository.findBySerialName("EMPLOYEE_CODE_NO")
+            ?: throw CustomException(ResponseCode.RESOURCE_NOT_FOUND)
+        val formattedSerial = employeeSerial.serialValue.toString().padStart(3, '0')
+        return "EMP$formattedSerial"
+    }
 
     fun getEmployeeProfiles(requestDto: EmployeeProfilesRequestDto): PageResponse<EmployeeProfileResponseDto> {
         val accountId = jwtUtil.extractUserIdFromAccessToken()
@@ -63,5 +73,12 @@ class EmployeeService(
         return departments.map { dept ->
             DepartmentResponseDto.from(dept)
         }
+    }
+
+    fun getEmployeeCode(): EmployeeCodeResponseDto {
+        val accountId = jwtUtil.extractUserIdFromAccessToken()
+        val employeeCode = getEmployeeSerial()
+        log.info { "Employee Code requested by account ID: $accountId" }
+        return EmployeeCodeResponseDto(employeeCode)
     }
 }
