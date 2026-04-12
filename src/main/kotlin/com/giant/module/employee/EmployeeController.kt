@@ -1,13 +1,11 @@
 package com.giant.module.employee
 
 import com.giant.common.api.doc.error.ErrorResponseDoc
+import com.giant.common.api.doc.success.SuccessResponseDoc
 import com.giant.common.api.response.ResponseDto
 import com.giant.common.api.response.SuccessResponseDto
-import com.giant.module.employee.doc.DepartmentsResponseDoc
-import com.giant.module.employee.doc.EmployeeCodeResponseDoc
-import com.giant.module.employee.doc.EmployeeProfileResponseDoc
-import com.giant.module.employee.doc.EmployeeProfilesResponseDoc
-import com.giant.module.employee.doc.PositionsResponseDoc
+import com.giant.module.employee.doc.*
+import com.giant.module.employee.dto.request.CreateEmployeeProfileRequestDto
 import com.giant.module.employee.dto.request.EmployeeProfilesRequestDto
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
@@ -168,6 +166,14 @@ class EmployeeController(
             ]
         ),
         ApiResponse(
+            responseCode = "404", description = "리소스 미 반환", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDoc.ResourceNotFound::class)
+                )
+            ]
+        ),
+        ApiResponse(
             responseCode = "500", description = "기타 오류", content = [
                 Content(
                     mediaType = "application/json",
@@ -200,6 +206,14 @@ class EmployeeController(
             ]
         ),
         ApiResponse(
+            responseCode = "404", description = "리소스 미 반환", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDoc.ResourceNotFound::class)
+                )
+            ]
+        ),
+        ApiResponse(
             responseCode = "500", description = "기타 오류", content = [
                 Content(
                     mediaType = "application/json",
@@ -210,4 +224,62 @@ class EmployeeController(
     )
     fun getEmployeeCode(): ResponseEntity<ResponseDto> =
         ResponseEntity.ok(SuccessResponseDto.WithResult(employeeService.getEmployeeCode()))
+
+    @PostMapping("/profiles")
+    @Operation(summary = "직원 프로필 등록")
+    @SecurityRequirement(name = "AccessToken")
+    @ApiResponses(
+        ApiResponse(
+            responseCode = "200", description = "직원 프로필 등록 성공", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = SuccessResponseDoc::class)
+                )
+            ]
+        ),
+        ApiResponse(
+            responseCode = "400", description = "입력 값 오류", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDoc.BadRequest::class)
+                )
+            ]
+        ),
+        ApiResponse(
+            responseCode = "401", description = "인증 오류", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDoc.Unauthorized::class)
+                )
+            ]
+        ),
+        ApiResponse(
+            responseCode = "403", description = "권한 오류", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDoc.Forbidden::class)
+                )
+            ]
+        ),
+        ApiResponse(
+            responseCode = "404", description = "리소스 미 반환", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDoc.ResourceNotFound::class)
+                )
+            ]
+        ),
+        ApiResponse(
+            responseCode = "500", description = "기타오류", content = [
+                Content(
+                    mediaType = "application/json",
+                    schema = Schema(implementation = ErrorResponseDoc.InternalServerError::class)
+                )
+            ]
+        )
+    )
+    fun createEmployee(@RequestBody @Valid requestDto: CreateEmployeeProfileRequestDto): ResponseEntity<ResponseDto> {
+        employeeService.createEmployee(requestDto)
+        return ResponseEntity.ok(SuccessResponseDto.Simple)
+    }
 }
