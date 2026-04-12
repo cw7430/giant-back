@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Pattern
 
-@Schema(name = "RegisterEmployeeProfile")
+@Schema(name = "CreateEmployeeProfile")
 data class CreateEmployeeProfileRequestDto(
     @field:NotBlank(message = "사원 이름을 입력해주세요.")
     @get:Schema(description = "사원 이름", example = "이사장")

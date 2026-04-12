@@ -8,6 +8,7 @@ import com.giant.module.auth.entity.Account
 import com.giant.module.auth.repository.AccountRepository
 import com.giant.module.employee.dto.request.CreateEmployeeProfileRequestDto
 import com.giant.module.employee.dto.request.EmployeeProfilesRequestDto
+import com.giant.module.employee.dto.request.UpdateEmployeeProfileRequestDto
 import com.giant.module.employee.dto.response.DepartmentResponseDto
 import com.giant.module.employee.dto.response.EmployeeCodeResponseDto
 import com.giant.module.employee.dto.response.EmployeeProfileResponseDto
@@ -140,5 +141,40 @@ class EmployeeService(
 
         log.info { "Create Employee successfully for account ID: $accountId" }
         log.info { "Created Employee: ${newEmployeeProfile.employeeId}" }
+    }
+
+    @Transactional
+    fun updateEmployee(id: Long, requestDto: UpdateEmployeeProfileRequestDto) {
+        val accountId = jwtUtil.extractUserIdFromAccessToken()
+        checkEmployeePermission(accountId)
+
+        if (
+            requestDto.positionCode == null &&
+            requestDto.teamCode == null &&
+            requestDto.employeeRole == null
+        ) {
+            return
+        }
+
+        val employeeProfile = employeeProfileRepository.findByIdOrNull(id)
+            ?: throw CustomException(ResponseCode.RESOURCE_NOT_FOUND)
+        val team = requestDto.teamCode?.let {
+            teamRepository.findByTeamCode(it)
+                ?: throw CustomException(ResponseCode.RESOURCE_NOT_FOUND)
+        }
+        val position = requestDto.positionCode?.let {
+            positionRepository.findByPositionCode(it)
+                ?: throw CustomException(ResponseCode.RESOURCE_NOT_FOUND)
+        }
+
+        employeeProfile.updateProfile(
+            updateBy = accountId,
+            employeeRole = requestDto.employeeRole,
+            team = team,
+            position = position
+        )
+
+        log.info { "Update Employee successfully for account ID: $accountId" }
+        log.info { "Updated Employee: $id" }
     }
 }
