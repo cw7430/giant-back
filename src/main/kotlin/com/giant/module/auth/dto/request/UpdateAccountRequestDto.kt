@@ -11,6 +11,7 @@ data class UpdateAccountRequestDto(
     @get:Schema(description = "비빌번호", example = "examplepw1234!@")
     val password: String,
 
+    @field:NotBlank(message = "전화번호를 입력해주세요.")
     @field:Pattern(
         regexp = "^(010|011|016|017|018|019)-\\d{3,4}-\\d{4}$",
         message = "전화번호 형식이 올바르지 않습니다."

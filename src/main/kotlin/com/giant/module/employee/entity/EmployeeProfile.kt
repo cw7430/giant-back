@@ -83,6 +83,19 @@ class EmployeeProfile(
         updatedAt = Instant.now()
     }
 
+    fun updateProfile(updateBy: Long, employeeRole: EmployeeRole?, team: Team?, position: Position?): EmployeeProfile {
+        this.updatedBy = updateBy
+        employeeRole?.let { this.employeeRole = it }
+        team?.let { this.team = it }
+        position?.let { this.position = it }
+        return this
+    }
+
+    fun withdraw() {
+        this.employeeRole = EmployeeRole.LEFT
+        this.leftAt = Instant.now()
+    }
+
     companion object {
         fun create(
             account: Account,

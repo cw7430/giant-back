@@ -4,34 +4,50 @@ import com.giant.common.api.exception.CustomException
 import com.giant.common.api.response.PageResponse
 import com.giant.common.api.type.ResponseCode
 import com.giant.common.config.security.JwtUtil
+import com.giant.module.auth.entity.Account
+import com.giant.module.auth.repository.AccountRepository
+import com.giant.module.employee.dto.request.CreateEmployeeProfileRequestDto
 import com.giant.module.employee.dto.request.EmployeeProfilesRequestDto
+import com.giant.module.employee.dto.request.UpdateEmployeeProfileRequestDto
 import com.giant.module.employee.dto.response.DepartmentResponseDto
 import com.giant.module.employee.dto.response.EmployeeCodeResponseDto
 import com.giant.module.employee.dto.response.EmployeeProfileResponseDto
 import com.giant.module.employee.dto.response.PositionResponseDto
-import com.giant.module.employee.repository.DepartmentRepository
-import com.giant.module.employee.repository.EmployeeProfileViewRepository
-import com.giant.module.employee.repository.EmployeeSerialRepository
-import com.giant.module.employee.repository.PositionRepository
+import com.giant.module.employee.entity.EmployeeProfile
+import com.giant.module.employee.repository.*
 import mu.KotlinLogging
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class EmployeeService(
+    private val accountRepository: AccountRepository,
+    private val employeeProfileRepository: EmployeeProfileRepository,
     private val employeeSerialRepository: EmployeeSerialRepository,
     private val employeeProfileViewRepository: EmployeeProfileViewRepository,
     private val positionRepository: PositionRepository,
     private val departmentRepository: DepartmentRepository,
+    private val teamRepository: TeamRepository,
     private val jwtUtil: JwtUtil,
+    private val passwordEncoder: PasswordEncoder
 ) {
     private val log = KotlinLogging.logger {}
 
-    fun getEmployeeSerial(): String {
-        val employeeSerial = employeeSerialRepository.findBySerialName("EMPLOYEE_CODE_NO")
-            ?: throw CustomException(ResponseCode.RESOURCE_NOT_FOUND)
-        val formattedSerial = employeeSerial.serialValue.toString().padStart(3, '0')
+    fun formatEmployeeCode(serial: Long): String {
+        val formattedSerial = serial.toString().padStart(3, '0')
         return "EMP$formattedSerial"
+    }
+
+    fun checkEmployeePermission(accountId: Long) {
+        val requesterInfo = employeeProfileRepository.findByIdOrNull(accountId)
+            ?: throw CustomException(ResponseCode.FORBIDDEN)
+        val allowed = setOf("TM100", "TM200")
+        if (requesterInfo.team.teamCode in allowed) {
+            return
+        }
+        throw CustomException(ResponseCode.FORBIDDEN)
     }
 
     fun getEmployeeProfiles(requestDto: EmployeeProfilesRequestDto): PageResponse<EmployeeProfileResponseDto> {
@@ -77,8 +93,88 @@ class EmployeeService(
 
     fun getEmployeeCode(): EmployeeCodeResponseDto {
         val accountId = jwtUtil.extractUserIdFromAccessToken()
-        val employeeCode = getEmployeeSerial()
+        val employeeSerial = employeeSerialRepository.findBySerialName("EMPLOYEE_CODE_NO")
+            ?: throw CustomException(ResponseCode.RESOURCE_NOT_FOUND)
+        val employeeCode = formatEmployeeCode(employeeSerial.serialValue)
         log.info { "Employee Code requested by account ID: $accountId" }
         return EmployeeCodeResponseDto(employeeCode)
+    }
+
+    @Transactional
+    fun createEmployee(requestDto: CreateEmployeeProfileRequestDto) {
+        val accountId = jwtUtil.extractUserIdFromAccessToken()
+        checkEmployeePermission(accountId)
+        val employeeSerial = employeeSerialRepository.findBySerialName("EMPLOYEE_CODE_NO")
+            ?: throw CustomException(ResponseCode.RESOURCE_NOT_FOUND)
+        val employeeCode = formatEmployeeCode(employeeSerial.serialValue)
+        val passwordHash = passwordEncoder.encode(employeeCode)!!
+
+        val newTeam = teamRepository.findByTeamCode(requestDto.teamCode)
+            ?: throw CustomException(ResponseCode.RESOURCE_NOT_FOUND)
+
+        val newPosition = positionRepository.findByPositionCode(requestDto.positionCode)
+            ?: throw CustomException(ResponseCode.RESOURCE_NOT_FOUND)
+
+        val newAccount = accountRepository.save(
+            Account.create(
+                userName = employeeCode,
+                passwordHash,
+                phoneNumber = requestDto.phoneNumber,
+                email = requestDto.email
+            )
+        )
+
+        val newEmployeeProfile = employeeProfileRepository.save(
+            EmployeeProfile.create(
+                account = newAccount,
+                employeeCode,
+                employeeName = requestDto.employeeName,
+                team = newTeam,
+                employeeRole = requestDto.employeeRole,
+                position = newPosition,
+                createdBy = accountId,
+                updatedBy = accountId
+            )
+        )
+
+        employeeSerial.increaseSerialValue()
+
+        log.info { "Create Employee successfully for account ID: $accountId" }
+        log.info { "Created Employee: ${newEmployeeProfile.employeeId}" }
+    }
+
+    @Transactional
+    fun updateEmployee(id: Long, requestDto: UpdateEmployeeProfileRequestDto) {
+        val accountId = jwtUtil.extractUserIdFromAccessToken()
+        checkEmployeePermission(accountId)
+
+        if (
+            requestDto.positionCode == null &&
+            requestDto.teamCode == null &&
+            requestDto.employeeRole == null
+        ) {
+            return
+        }
+
+        val employeeProfile = employeeProfileRepository.findByIdOrNull(id)
+            ?: throw CustomException(ResponseCode.RESOURCE_NOT_FOUND)
+        val team = requestDto.teamCode?.let {
+            teamRepository.findByTeamCode(it)
+                ?: throw CustomException(ResponseCode.RESOURCE_NOT_FOUND)
+        }
+        val position = requestDto.positionCode?.let {
+            positionRepository.findByPositionCode(it)
+                ?: throw CustomException(ResponseCode.RESOURCE_NOT_FOUND)
+        }
+
+        employeeProfile.updateProfile(
+            updateBy = accountId,
+            employeeRole = requestDto.employeeRole,
+            team = team,
+            position = position
+        )
+
+        log.info { "Update Employee successfully for account ID: $accountId" }
+        log.info { "Updated Employee: $id" }
     }
 }
