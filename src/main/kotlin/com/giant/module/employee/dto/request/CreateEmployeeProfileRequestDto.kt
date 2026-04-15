@@ -8,6 +8,14 @@ import jakarta.validation.constraints.Pattern
 
 @Schema(name = "CreateEmployeeProfile")
 data class CreateEmployeeProfileRequestDto(
+    @field:NotBlank(message = "사번을 생성해주세요.")
+    @get:Schema(description = "사번", example = "EMP001")
+    @field:Pattern(
+        regexp = "^EMP\\d{3,}$",
+        message = "사번 형식이 올바르지 않습니다."
+    )
+    val employeeCode: String,
+
     @field:NotBlank(message = "사원 이름을 입력해주세요.")
     @get:Schema(description = "사원 이름", example = "이사장")
     val employeeName: String,

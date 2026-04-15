@@ -2,7 +2,10 @@ package com.giant.common
 
 import com.giant.module.auth.repository.AccountRepository
 import com.giant.module.auth.repository.RefreshTokenRepository
-import com.giant.module.employee.repository.*
+import com.giant.module.employee.repository.DepartmentRepository
+import com.giant.module.employee.repository.EmployeeProfileRepository
+import com.giant.module.employee.repository.PositionRepository
+import com.giant.module.employee.repository.TeamRepository
 import mu.KotlinLogging
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -15,7 +18,6 @@ class AppService(
     private val positionRepository: PositionRepository,
     private val departmentRepository: DepartmentRepository,
     private val teamRepository: TeamRepository,
-    private val employeeSerialRepository: EmployeeSerialRepository
 ) {
     private val log = KotlinLogging.logger {}
 
@@ -36,7 +38,5 @@ class AppService(
         log.info { "department table called: ${department.toString()}" }
         val team = teamRepository.findByIdOrNull(1)
         log.info { "team table called: ${team.toString()}" }
-        val employeeSerial = employeeSerialRepository.findByIdOrNull(1)
-        log.info { "serial table called: ${employeeSerial.toString()}" }
     }
 }

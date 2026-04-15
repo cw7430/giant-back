@@ -25,20 +25,15 @@ import org.springframework.transaction.annotation.Transactional
 class EmployeeService(
     private val accountRepository: AccountRepository,
     private val employeeProfileRepository: EmployeeProfileRepository,
-    private val employeeSerialRepository: EmployeeSerialRepository,
     private val employeeProfileViewRepository: EmployeeProfileViewRepository,
     private val positionRepository: PositionRepository,
     private val departmentRepository: DepartmentRepository,
     private val teamRepository: TeamRepository,
+    private val sequenceGenerateRepository: SequenceGenerateRepository,
     private val jwtUtil: JwtUtil,
     private val passwordEncoder: PasswordEncoder
 ) {
     private val log = KotlinLogging.logger {}
-
-    fun formatEmployeeCode(serial: Long): String {
-        val formattedSerial = serial.toString().padStart(3, '0')
-        return "EMP$formattedSerial"
-    }
 
     fun checkEmployeePermission(accountId: Long) {
         val requesterInfo = employeeProfileRepository.findByIdOrNull(accountId)
@@ -93,10 +88,12 @@ class EmployeeService(
 
     fun getEmployeeCode(): EmployeeCodeResponseDto {
         val accountId = jwtUtil.extractUserIdFromAccessToken()
-        val employeeSerial = employeeSerialRepository.findBySerialName("EMPLOYEE_CODE_NO")
-            ?: throw CustomException(ResponseCode.RESOURCE_NOT_FOUND)
-        val employeeCode = formatEmployeeCode(employeeSerial.serialValue)
+        checkEmployeePermission(accountId)
+        val employeeSerial = sequenceGenerateRepository.nextEmployeeCode()
+        val formattedSerial = employeeSerial.toString().padStart(3, '0')
+        val employeeCode = "EMP$formattedSerial"
         log.info { "Employee Code requested by account ID: $accountId" }
+        log.info { "Employee Code: $employeeCode" }
         return EmployeeCodeResponseDto(employeeCode)
     }
 
@@ -104,10 +101,8 @@ class EmployeeService(
     fun createEmployee(requestDto: CreateEmployeeProfileRequestDto) {
         val accountId = jwtUtil.extractUserIdFromAccessToken()
         checkEmployeePermission(accountId)
-        val employeeSerial = employeeSerialRepository.findBySerialName("EMPLOYEE_CODE_NO")
-            ?: throw CustomException(ResponseCode.RESOURCE_NOT_FOUND)
-        val employeeCode = formatEmployeeCode(employeeSerial.serialValue)
-        val passwordHash = passwordEncoder.encode(employeeCode)!!
+
+        val passwordHash = passwordEncoder.encode(requestDto.employeeCode)!!
 
         val newTeam = teamRepository.findByTeamCode(requestDto.teamCode)
             ?: throw CustomException(ResponseCode.RESOURCE_NOT_FOUND)
@@ -117,7 +112,7 @@ class EmployeeService(
 
         val newAccount = accountRepository.save(
             Account.create(
-                userName = employeeCode,
+                userName = requestDto.employeeCode,
                 passwordHash,
                 phoneNumber = requestDto.phoneNumber,
                 email = requestDto.email
@@ -127,7 +122,7 @@ class EmployeeService(
         val newEmployeeProfile = employeeProfileRepository.save(
             EmployeeProfile.create(
                 account = newAccount,
-                employeeCode,
+                requestDto.employeeCode,
                 employeeName = requestDto.employeeName,
                 team = newTeam,
                 employeeRole = requestDto.employeeRole,
@@ -136,8 +131,6 @@ class EmployeeService(
                 updatedBy = accountId
             )
         )
-
-        employeeSerial.increaseSerialValue()
 
         log.info { "Create Employee successfully for account ID: $accountId" }
         log.info { "Created Employee: ${newEmployeeProfile.employeeId}" }
