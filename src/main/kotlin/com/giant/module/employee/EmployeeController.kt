@@ -186,7 +186,7 @@ class EmployeeController(
     fun getDepartments(): ResponseEntity<ResponseDto> =
         ResponseEntity.ok(SuccessResponseDto.WithResult(employeeService.getDepartments()))
 
-    @GetMapping("/employee-code")
+    @PostMapping("/employee-code")
     @Operation(summary = "사번 조회")
     @SecurityRequirement(name = "AccessToken")
     @ApiResponses(
