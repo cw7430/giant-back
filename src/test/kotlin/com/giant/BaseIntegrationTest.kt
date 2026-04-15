@@ -2,9 +2,15 @@ package com.giant
 
 import com.giant.module.auth.entity.Account
 import com.giant.module.auth.repository.AccountRepository
-import com.giant.module.employee.entity.*
+import com.giant.module.employee.entity.Department
+import com.giant.module.employee.entity.EmployeeProfile
+import com.giant.module.employee.entity.Position
+import com.giant.module.employee.entity.Team
 import com.giant.module.employee.entity.type.EmployeeRole
-import com.giant.module.employee.repository.*
+import com.giant.module.employee.repository.DepartmentRepository
+import com.giant.module.employee.repository.EmployeeProfileRepository
+import com.giant.module.employee.repository.PositionRepository
+import com.giant.module.employee.repository.TeamRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired
@@ -32,9 +38,6 @@ abstract class BaseIntegrationTest {
     lateinit var teamRepository: TeamRepository
 
     @Autowired
-    lateinit var employeeSerialRepository: EmployeeSerialRepository
-
-    @Autowired
     lateinit var employeeProfileRepository: EmployeeProfileRepository
 
     @Autowired
@@ -44,16 +47,10 @@ abstract class BaseIntegrationTest {
     @Transactional
     fun setUp() {
         val testPasswordHash = passwordEncoder.encode("0000")!!
-        val testEmployeeSerial = employeeSerialRepository.save(
-            EmployeeSerial.create("EMPLOYEE_CODE_NO", 1L)
-        )
-        val testEmployeeCode =
-            "EMP" + testEmployeeSerial.serialValue
-                .toString()
-                .padStart(3, '0')
+
         val testAccount = accountRepository.save(
             Account.create(
-                userName = testEmployeeCode,
+                userName = "EMP001",
                 passwordHash = testPasswordHash,
                 phoneNumber = "010-1234-1234",
                 email = "email@email.com"
@@ -84,7 +81,7 @@ abstract class BaseIntegrationTest {
         employeeProfileRepository.save(
             EmployeeProfile.create(
                 account = testAccount,
-                employeeCode = testEmployeeCode,
+                employeeCode = "EMP001",
                 employeeName = "이사장",
                 team = testTeam,
                 employeeRole = EmployeeRole.DEPARTMENT_CHIEF,
@@ -92,9 +89,6 @@ abstract class BaseIntegrationTest {
                 createdBy = testAccountId,
                 updatedBy = testAccountId,
             )
-        )
-        employeeSerialRepository.save(
-            testEmployeeSerial.increaseSerialValue()
         )
     }
 
@@ -105,6 +99,5 @@ abstract class BaseIntegrationTest {
         departmentRepository.deleteAll()
         positionRepository.deleteAll()
         accountRepository.deleteAll()
-        employeeSerialRepository.deleteAll()
     }
 }

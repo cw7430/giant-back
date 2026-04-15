@@ -207,14 +207,6 @@ class EmployeeController(
             ]
         ),
         ApiResponse(
-            responseCode = "404", description = "리소스 미 반환", content = [
-                Content(
-                    mediaType = "application/json",
-                    schema = Schema(implementation = ErrorResponseDoc.ResourceNotFound::class)
-                )
-            ]
-        ),
-        ApiResponse(
             responseCode = "500", description = "기타 오류", content = [
                 Content(
                     mediaType = "application/json",
@@ -337,7 +329,10 @@ class EmployeeController(
             ]
         )
     )
-    fun updateEmployee(@PathVariable id: Long, @RequestBody @Valid requestDto: UpdateEmployeeProfileRequestDto): ResponseEntity<ResponseDto> {
+    fun updateEmployee(
+        @PathVariable id: Long,
+        @RequestBody @Valid requestDto: UpdateEmployeeProfileRequestDto
+    ): ResponseEntity<ResponseDto> {
         employeeService.updateEmployee(id, requestDto)
         return ResponseEntity.ok(SuccessResponseDto.Simple)
     }
